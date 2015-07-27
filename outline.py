@@ -1,19 +1,4 @@
 """
-Timetable:
-Start - Finish  ; Date   ; Work / Notes
-
-11:00 - 12:30 PM; 7/12/15; Meeting and Discussion
-12:00 - 01:00 PM; 7/15/15; Research
-04:30 - 05:15 PM; 7/16/15; Outline / Research / Setup
-01:30 - 02:30 PM; 7/17/15; Setup / Testing
-01:00 - 03:00 PM; 7/19/15; Setup / Testing / Base Code (~50% of foundational code)
-03:10 - 04:35 PM; 7/20/15; Base Code (most foundational code, primative and incomplete functionality)
-01:30 - 03:30 PM; 7/23/15; Base Code (general functionality achieved, added dispersion plot)
-01:05 - 03:15 PM; 7/24/15; Base Code (1.0 functionality, includes all excel data)
-10:30 - 12:00 PM; 7/27/15; Meeting and Discussion
-
-Total time:  mins ->  hours  minutes
-
 Current issues:
 program will not continue until dispersion plot is exited, redo UI here
 related words auto-prints in inconistant format
