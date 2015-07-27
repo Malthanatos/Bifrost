@@ -1,0 +1,156 @@
+*** Introductory Examples for the NLTK Book ***
+Loading text1, ..., text9 and sent1, ..., sent9
+Type the name of the text or sentence to view it.
+Type: 'texts()' or 'sents()' to list the materials.
+text1: Moby Dick by Herman Melville 1851
+text2: Sense and Sensibility by Jane Austen 1811
+text3: The Book of Genesis
+text4: Inaugural Address Corpus
+text5: Chat Corpus
+text6: Monty Python and the Holy Grail
+text7: Wall Street Journal
+text8: Personals Corpus
+text9: The Man Who Was Thursday by G . K . Chesterton 1908
+Please enter an available corpus to refrence (ex text1): text5
+Please enter a word to analyze: light
+
+Related words within selected corpus: 
+
+Word's distribution within the corpus: (see second window)
+
+Note: in current development stage the program cannot continue until the 
+frequency distribution window is closed.
+
+Total number of tokens:             45010
+Number of unique tokens:            6066
+Richness of the text:               0.13477005109975562
+Count of word's occurences:         3
+Rate of word's occurence per token: 0.0066651855143301485
+
+Defintions:
+noun: (physics) electromagnetic radiation that can produce a visual sensation
+noun: any device serving as a source of illumination
+noun: a particular perspective or aspect of a situation
+noun: the quality of being luminous; emitting or reflecting light
+noun: an illuminated area
+noun: a condition of spiritual awareness; divine illumination
+noun: the visual effect of illumination on objects or scenes as created in pictures
+noun: a person regarded very fondly
+noun: having abundant light or illumination
+noun: mental understanding as an enlightening experience
+noun: merriment expressed by a brightness or gleam or animation of countenance
+noun: public awareness
+noun: a divine presence believed by Quakers to enlighten and guide the soul
+noun: a visual warning signal
+noun: a device for lighting or igniting fuel or charges or fires
+verb: make lighter or brighter
+verb: begin to smoke
+verb: to come to rest, settle
+verb: cause to start burning; subject to fire or great heat
+verb: fall to somebody by assignment or lot
+verb: alight from (a horse)
+adjective: of comparatively little physical weight or density
+adjective: (used of color) having a relatively small amount of coloring agent
+adjective: of the military or industry; using (or being) relatively small or light arms or equipment
+adjective: not great in degree or quantity or number
+adjective: psychologically light; especially free from sadness or troubles
+adjective: characterized by or emitting light
+satellite adjective: (used of vowels or syllables) pronounced with little or no stress
+satellite adjective: easily assimilated in the alimentary canal; not rich or heavily seasoned
+satellite adjective: (used of soil) loose and large-grained in consistency
+satellite adjective: (of sound or color) free from anything that dulls or dims
+satellite adjective: moving easily and quickly; nimble
+satellite adjective: demanding little effort; not burdensome
+adjective: of little intensity or power or force
+adjective: (physics, chemistry) not having atomic weight greater than average
+satellite adjective: weak and likely to lose consciousness
+satellite adjective: very thin and insubstantial
+satellite adjective: marked by temperance in indulgence
+satellite adjective: less than the correct or legal or full amount often deliberately so
+satellite adjective: having little importance
+satellite adjective: intended primarily as entertainment; not serious or profound
+satellite adjective: silly or trivial
+satellite adjective: designed for ease of movement or to carry little weight
+satellite adjective: having relatively few calories
+satellite adjective: (of sleep) easily disturbed
+satellite adjective: casual and unrestrained in sexual behavior
+adverb: with few burdens
+
+Related words:
+Synonyms:
+light
+visible_light
+visible_radiation
+
+Antonyms:
+dark
+heavy
+
+Hypernyms:
+beam
+candlelight
+corona
+counterglow
+daylight
+firelight
+fluorescence
+friar's_lantern
+gaslight
+glow
+half-light
+incandescence
+lamplight
+luminescence
+meteor
+moonlight
+radiance
+scintillation
+starlight
+streamer
+sunlight
+torchlight
+twilight
+
+Hyponyms:
+actinic_radiation
+
+TASA number: 66.7
+
+AOA data:
+OccurTotal:      19.0
+OccurNum:        19.0
+Freq_pm:         165.19607843137254
+Rating.Mean:     4.05
+Rating.SD:       1.99
+(unknown value): 1.0
+
+AWL value: None
+
+SUBTLEX data:
+FREQcount:  8425.0
+CScount:    3924.0
+FREQlow:    7737.0
+CDlow:      3767.0
+SUBTL_WF:   165.19607843137254
+Log_10(WF): 3.925621454790829
+SUBTL_CD:   46.78111587982833
+Log_10(CD): 3.5938396610812715
+
+Zeno data:
+sfi:  66.7
+d:    0.8234
+u:    464.0
+f:    9366.0
+gr1:  356.0
+gr2:  353.0
+gr3:  454.0
+gr4:  439.0
+gr5:  518.0
+gr6:  508.0
+gr7:  524.0
+gr8:  503.0
+gr9:  493.0
+gr10: 470.0
+gr11: 467.0
+gr12: 433.0
+gr13: 311.0
