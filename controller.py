@@ -1,71 +1,169 @@
 # Controller
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  3:10 PM 7/24/15
-# Version       1.0
+# Last Updated  3:00 PM 8/6/15
+# Version       1.6
 
 import UI#, GUI
 import nltk
 import xlrd
 import xlwt
-from nltk.book import *
 from nltk.corpus import wordnet
 
 #global variable declarations:
+load_excel_files = True
+load_NLTK_corpora = True
+if load_NLTK_corpora:
+    from nltk.book import *
 word = ''
-corpus = ''
-aoa = ''
-awl = ''
-subtlex = ''
-tasa = ''
-zeno = ''
+corpus = 0
+aoa = 'AoA.xlsx'
+awl = 'AWL.xls'
+subtlex = 'SUBTLEX.xlsx'
+tasa = 'tasa.xlsx'
+zeno = 'Zeno.xlsx'
 
 #Note: excel coords act as follows:
 #cell(0,0) -> A-1   and cell(1,10) -> B-11
 
 def run()->None:
     """Initializes program"""
-    global corpus
-    excel_setup()
-    corpus, word = UI.setup()
-    corpus = eval(corpus)
-    #print('hello')
-    #print(corpus)
-    UI.return_data(analyze(word))
-    #print('goodbye')
+    #global corpus
+    #may want to load excel files on a case by case basis later on
+    if load_excel_files:
+        print("Loading excel files...")
+        excel_setup()
+        print("Done")
+    UI.setup()
+    #if corpus != None:
+        #corpus = eval(corpus)
+    #UI.return_data(analyze(word))
+    print('''
+Notes: some 2 part words can be analyzed, however, the results
+       - of the analysis of such words may be inconsistant depending on
+       - whether the input uses a space or an underscore to seperate them
+       entering default as an option when it is available will run the
+       - given function using a set of predetermined common words
+       - (see common words.txt)''')
+    while True:
+        interface_data = UI.interface()
+        if interface_data[0] == 'quit':
+            break
+        elif interface_data == (None,None):
+            continue
+        UI.print_data(collect_data(interface_data))
     return
+
+def collect_data(in_data)->list:
+    """collects the data requested"""
+    #print(word)
+    function = in_data[0]
+    other = in_data[1]
+    if function == 'newc':
+        data = corupus_setup(other[0], other[1])
+    if function == 'swa':
+        data = analyze([other], False)
+    if function == 'swac':
+        data = analyze([other[1]], True, other[0])
+    if function == 'mwa':
+        data = analyze(other, False)
+    if function == 'mwac':
+        data = analyze(other[1], True, other[0])
+    if function == 'mwaxl':
+        words = excel_words(other[0], other[1])
+        data = analyze(words, False)
+    if function == 'polys':
+        data = polysemy(other)
+    if function == 'mindep':
+        data = mindepth(other)
+    if function == 'dtree':
+        data = depth_tree(other)
+    return (data, function)
 
 def excel_setup()->None:
     """opens the necessary files/worksheets from excel documents"""
-    global aoa, awl, subtlex, tasa, zeno
-    #open files
-    aoa = xlrd.open_workbook('AoA.xlsx')
-    awl = xlrd.open_workbook('AWL.xls')
-    subtlex = xlrd.open_workbook('SUBTLEX.xlsx')
-    tasa = xlrd.open_workbook('tasa.xlsx')
-    zeno = xlrd.open_workbook('Zeno.xlsx')
-    #open worksheets
-    aoa = aoa.sheet_by_index(0)
-    awl = awl.sheet_by_index(0)
-    subtlex = subtlex.sheet_by_index(0)
-    tasa = tasa.sheet_by_index(0)
-    zeno = zeno.sheet_by_index(0)
+    global awl, aoa, tasa, subtlex, zeno
+    #I tried to make a for loop for this but it never worked...
+    try:
+        awl = xlrd.open_workbook('AWL.xls')
+        awl = awl.sheet_by_index(0)
+        print("1/5")
+    except:
+        print("Failed to load file: AWL.xls")
+    try:
+        aoa = xlrd.open_workbook('AoA.xlsx')
+        aoa = aoa.sheet_by_index(0)
+        print("2/5")
+    except:
+        print("Failed to load file: AoA.xlsx")
+    try:
+        tasa = xlrd.open_workbook('tasa.xlsx')
+        tasa = tasa.sheet_by_index(0)
+        print("3/5")
+    except:
+        print("Failed to load file: tasa.xlsx")
+    try:
+        subtlex = xlrd.open_workbook('SUBTLEX.xlsx')
+        subtlex = subtlex.sheet_by_index(0)
+        print("4/5")
+    except:
+        print("Failed to load file: SUBTLEX.xlsx")
+
+    try:
+        zeno = xlrd.open_workbook('Zeno.xlsx')
+        zeno = zeno.sheet_by_index(0)
+    except:
+        print("Failed to load file: Zeno.xlsx")
     return
 
-def contents(file: str)->[str]:
-    """returns a list of the contents of the given file"""
+def excel_words(file, sheet)->list:
+    '''returns a list of words from an excel file'''
+    #Note: current config does not require file but is included for possible future use
     result = []
+    for pos in range(sheet.nrows):
+        result.append(sheet.cell(pos,0).value)
     return result
 
-def analyze(word: str)->[str]:
+def corupus_setup(file, name: str)->bool:
+    '''sets up a new corpus to be selected from'''
+    try:
+        listing = open('corpora.txt', 'a')
+        corpora = open('corpora.txt', 'r')
+        index = int(corpora.read().splitlines()[-1].split()[0]) + 1
+        listing.write('\n{}\t{}\t{}'.format(index,name,file))
+        listing.close()
+        file.close()
+        UI.setup()
+        #UI.corpora.append('{}\t{}\t{}'.format(index,name,file))
+        #UI.max_index = index
+    except:
+        print("Could not install new corpus...")
+    return True
+
+def analyze(words: [str], nltk: bool, corpus_id = 0)->[str]:
     """analyze a given word and report all available data"""
-    result = [[],[],[]]
-    #nltk analysis
-    result[0] = nltk_data(word)
-    #wordnet analysis
-    result[1] = wordnet_data(word)
-    #excel analysis
-    result[2] = excel_data(word)
+    global corpus
+    if corpus_id != 0:
+        if corpus_id < 10:
+            corpus = eval('text' + str(corpus_id))
+        else:
+            corpus = UI.corpora[corpus_id-1].split('\t')[2]
+            corpus = open(corpus, 'r').read()
+    result = []
+    x = 0
+    for word in words:
+        result.append(list())
+        result[x].append(word)
+        #nltk analysis
+        if nltk:
+            result[x].append(nltk_data(word))
+        else:
+            result[x].append(None)
+        #wordnet analysis
+        result[x].append(wordnet_data(word))
+        #excel analysis
+        result[x].append(excel_data(word))
+        x += 1
     return result
 
 def nltk_data(word: str)->[str]:
@@ -75,7 +173,10 @@ def nltk_data(word: str)->[str]:
     #similar seems to auto-print and return None
     #technically part of UI:
     print("\nRelated words within selected corpus: ")
-    corpus.similar(word)
+    try:
+        corpus.similar(word)
+    except:
+        print("Can't print related words from non-NLTK corpora")
     result[0] = len(corpus)
     result[1] = len(set(corpus))
     result[2] = result[1] / result[0]
@@ -83,11 +184,13 @@ def nltk_data(word: str)->[str]:
     result[4] = 100 * result[3] / result[0]
     #see UI for more specifics here:
     try:
-        print("Word's distribution within the corpus: (see second window)")
+        print("\nWord's distribution within the corpus: (see second window)")
         print("\nNote: in current development stage the program cannot continue until the \nfrequency distribution window is closed.")
         corpus.dispersion_plot([word])
     except (ValueError, ImportError):
         print("\nMatplot and/or numpy libraries are not installed, frequecny distribution cannot be displayed")
+    except (AttributeError):
+        print("Cannot display distribution plot for non-NLTK corpus")
     except(...):
         print("An unknown error occured while attempting to display the word's frequency distribution")
     return result
@@ -115,25 +218,94 @@ def wordnet_data(word: str)->[str]:
     #how to find similar words? Doesn't the corpus analysis do this? Hyponyms?
     return result
 
+def polysemy(word_source: str)->list:
+    '''returns a list of polysemy data for a given word set'''
+    if word_source == 'default':
+        file = open('common words.txt')
+        words = file.read().splitlines()
+    elif word_source == 'manual':
+        print("Please enter a string of words seperated only by spaces: ")
+        words = input().strip().lower().split()
+    #words = [w.lower() for w in word_list]
+    result = []
+    for word in words:
+        word_data = [word,0,0,0,0,0]
+        word_info = wordnet.synsets(word)
+        for synset in word_info:
+            #result.append(sysnest.pos())
+            if synset.pos() == 'n':
+                word_data[1] += 1
+            if synset.pos() == 'a':
+                word_data[2] += 1
+            if synset.pos() == 's':
+                word_data[3] += 1
+            if synset.pos() == 'r':
+                word_data[4] += 1
+            if synset.pos() == 'v':
+                word_data[5] += 1
+        result.append(word_data)
+    return result
+
+def mindepth(word_source)->list:
+    '''returns a list of tuples of a word and its min depth'''
+    #if word_source == 'default':
+    if word_source == 'default':
+        file = open('common words.txt')
+        words = file.read().splitlines()
+    elif word_source == 'manual':
+        print("Please enter a string of words seperated only by spaces: ")
+        words = input().strip().lower().split()
+    #words = [w.lower() for w in word_list]
+    result = []
+    for word in words:
+        result.append((word,wordnet.synsets(word)[0].min_depth()))
+    return result
+
+def depth_tree(word)->str:
+    '''returns the word's depth tree'''
+    word = wordnet.synsets(word)[0]
+    hyp = lambda w:w.hypernyms()
+    return word.tree(hyp)
+
 #Note: excel data is not optimally formatted, so linear search is used
 #      this may be changed to binary search later on when the files are in alphabetical order
 
 def excel_data(word: str)->[str]:
     """returns a list of all excel data"""
-    result = [[],[],[],[],[]]
-    result[0] = tasa_data(word)
-    result[1] = aoa_data(word)
-    result[2] = awl_data(word)
-    result[3] = subtlex_data(word)
-    result[4] = zeno_data(word)
+    result = [None,None,None,None,None]
+    result[0] = 0
+    result[1] = [None,None,None,None,None,None]
+    result[2] = 0
+    result[3] = [None,None,None,None,None,None,None,None]
+    result[4] = [None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None]
+    try:
+        result[0] = awl_data(word)
+    except:
+        print("\nLoading AWL data failed\n")
+    try:
+        result[1] = aoa_data(word)
+    except:
+        print("\nLoading AoA data failed\n")
+    try:
+        result[2] = tasa_data(word)
+    except:
+        print("\nLoading tasa data failed\n")
+    try:
+        result[3] = subtlex_data(word)
+    except:
+        print("\nLoading SUBTLEX data failed\n")
+    try:
+        result[4] = zeno_data(word)
+    except:
+        print("\nLoading Zeno data failed\n")
     return result    
 
-def tasa_data(word: str)->int:
-    """locates and returns a word's tasa data"""
-    result = None
-    for pos in range(tasa.nrows):
-        if (word == tasa.cell(pos,0).value):
-            result = tasa.cell(pos,1).value
+def awl_data(word: str)->int:
+    """returns all available awl data"""
+    result = 0
+    for pos in range(awl.nrows):
+        if (word == awl.cell(pos,0).value):
+            result = awl.cell(pos,1).value   #AWL rating
             break
         pos += 1
     return result
@@ -153,12 +325,12 @@ def aoa_data(word: str)->[str]:
         pos += 1
     return result
 
-def awl_data(word: str)->[int]:
-    """returns all available awl data"""
-    result = None
-    for pos in range(awl.nrows):
-        if (word == awl.cell(pos,0).value):
-            result = awl.cell(pos,1).value   #AWL rating
+def tasa_data(word: str)->int:
+    """locates and returns a word's tasa data"""
+    result = 0
+    for pos in range(tasa.nrows):
+        if (word == tasa.cell(pos,0).value):
+            result = tasa.cell(pos,1).value
             break
         pos += 1
     return result
@@ -205,16 +377,6 @@ def zeno_data(word: str)->[str]:
             break
         pos += 1
     return result
-
-
-
-
-
-
-
-
-
-
 
 if __name__ == '__main__':
     run()

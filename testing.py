@@ -10,17 +10,23 @@ import xlwt
 #from nltk.book import *
 from nltk.corpus import wordnet
 
+sheet = ''
+
 def run():
     #texts() or sents() for material list
     #text1 -> name of text
-
+    global sheet
     
-    #workbook = xlrd.open_workbook('Zeno.xlsx')
-    #sheet = workbook.sheet_by_index(0)
-    #for value in sheet.col_values(0):
-        #if value[0] == 'd':
-            #print(value)
-    word = 'whale'
+    workbook = xlrd.open_workbook('tasa.xlsx')
+    sheet = workbook.sheet_by_index(0)
+    run2()
+    return
+
+def run2():
+    for value in sheet.col_values(0):
+        if value[0] == 'd':
+            print(value)
+    '''word = 'whale'
     result = [[],[],[],set(),[]]
     word_info = wordnet.synsets(word)[0]
     lemmas = wordnet.lemmas(word)
@@ -29,7 +35,7 @@ def run():
         print(lemma.hyponyms())
         print(lemma.pertainyms())
         #print(lemma.synonyms())
-        print(lemma.antonyms())
+        print(lemma.antonyms())'''
     '''for synset in wordnet.synsets(word):
         result[0].append(synset.definition())
         result[1].append(synset.pos())
@@ -140,7 +146,7 @@ word net (ch 2, section 5)
 >>> dog = wn.synset('dog.n.01')
 >>> hyp = lambda s:s.hypernyms()
 >>> from pprint import pprint
->>> print(dog.tree(hyp))
+>>> pprint(dog.tree(hyp))
     -> tree of words of decreasing specificity
 '''
 

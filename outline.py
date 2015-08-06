@@ -1,6 +1,7 @@
 """
 Current issues:
 program will not continue until dispersion plot is exited, redo UI here
+program will only display dispersion fo one word at a time in mwa/mwac/mwaxl
 related words auto-prints in inconistant format
 synonyms need work, as do antonyms (maybe add second degree words)
 
@@ -54,7 +55,7 @@ second stage:
 
     add simple support to add new corpus
 
-
+https://github.com/nltk/nltk/wiki/Adding-a-Corpus
 
 
 """
