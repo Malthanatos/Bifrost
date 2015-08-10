@@ -10,11 +10,13 @@ import xlrd
 import xlwt
 from nltk.corpus import wordnet
 
-#global variable declarations:
+#Debugging:
 load_excel_files = True
-load_NLTK_corpora = True
+load_NLTK_corpora = False
 if load_NLTK_corpora:
     from nltk.book import *
+
+#global variable declarations:
 word = ''
 corpus = 0
 aoa = 'AoA.xlsx'
@@ -51,7 +53,7 @@ Notes: some 2 part words can be analyzed, however, the results
             break
         elif interface_data == (None,None):
             continue
-        UI.print_data(collect_data(interface_data))
+        UI.output_data(collect_data(interface_data))
     return
 
 def collect_data(in_data)->list:

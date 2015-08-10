@@ -6,14 +6,17 @@
 
 #import controller
 #controller.excel_setup()
+import excel
 import xlrd, xlwt
 from os.path import exists
 
 corpora = []
 max_index = 0
+output = 0
 
 menu = """
 Enter a command:
+output   change type of output between shell text and external documentation
 newc     add a new corpus (not working right now)
 listc    lists all available corpora by registered name
 swa      single word analysis
@@ -36,27 +39,15 @@ def setup()->None:
     max_index = len(corpora)
     return
 
-'''def setup()->(str,str):
-    """Asks the user for a corpus refrence"""
-    #print(nltk.book.texts())
-    corpus = ""
-    word = ""
-    while True:
-        corpus = input("Please enter an available corpus to refrence (ex text1): ")
-        if corpus != "":
-            #this is temporary
-            if (corpus not in ['text1','text2','text3','text4','text5','text6','text7','text8','text9']):
-                print("This corpus does not exist or is not available")
-            else:
-                break
-    word = input("Please enter a word to analyze: ").lower()
-    return (corpus, words)'''
-
 def interface()->(str, int):
     """asks the user what to do and then asks the controller to do it"""
+    global output
     while True:
         cmd = input(menu).strip().lower()
-        if cmd == 'newc':
+        if cmd == 'output':
+            output = change_output()
+            return (None,None)
+        elif cmd == 'newc':
             return ('newc', newc())
         elif cmd == 'listc':
             print('Available corpora:')
@@ -64,19 +55,14 @@ def interface()->(str, int):
                 print(c)
             return (None,None)
         elif cmd == 'swa':
-            #print(single_word_analysis())
             return ('swa', swa())
         elif cmd == 'swac':
-            #print(single_word_analysis_with_corpus())
             return ('swac', swac())
         elif cmd == 'mwa':
-            #print(multi_word_analysis())
             return ('mwa', mwa())
         elif cmd == 'mwac':
-            #print(multi_word_analysis_with_corpus())
             return ('mwac', mwac())
         elif cmd == 'mwaxl':
-            #print(multi_word_analysis_from_excel())
             return ('mwaxl', mwaxl())
         elif cmd == 'polys':
             return ('polys', polys())
@@ -90,6 +76,19 @@ def interface()->(str, int):
         else:
             print("Invalid command, please try again")
     return
+
+def change_output()->int:
+    '''allows user to change the programs output to text and/or excel file'''
+    while True:
+        output_type = input("Change output to (excel, shell text (default), both): ").strip().lower()
+        if output_type in ['text', 'shell text', 'default']:
+            return 0
+        elif output_type == 'excel':
+            return 1
+        elif output_type == 'both':
+            return 2
+        else:
+            print("Invalid output type, please select from: excel, text, or both")
 
 def newc()->('file', str):
     """tell controller to add a new corpus given its name"""
@@ -205,6 +204,52 @@ def mindep()->str:
 def dtree()->str:
     '''returns the depth tree for a given word'''
     return input("Please enter a word to analyze: ").strip().lower()
+
+def output_data(value)->None:
+    '''selects between output styles and call the correct function/s'''
+    if output != 1:
+        print_data(value)
+    if output != 0:
+        data_to_file(value)
+
+def data_to_file(value)->None:
+    '''outputs the data as a file of specified name and type'''
+    print("""
+Warning: for the moment this program cannot append to files,
+only create and overwrite them, please be careful about using existing files
+You can specify a different sheet number to use if you wish to add to a file
+
+Also, please choose a file type of either .xls or .xlsx (old vs. new excel)
+          """)
+    while True:
+        file_name = input("Please enter the name of the file you would to craete, including the extension: ")
+        print("\n{}\n".format(file_name))
+        sure = input("Are you sure this is the file name you wish to use (y/n)").strip().lower()
+        if sure not in ['y', 'yes']:
+            continue
+        if file_name.split('.')[1] not in ['xls','xlsx']:
+            print("This file type is not currently supported")
+            continue
+        while True:
+            sheet_index = input("Please enter a sheet number: ").strip().lower()
+            try:
+                sheet_index = int(sheet_index)
+                break
+            except:
+                print("Invalid sheet number")
+        break
+    file_from_data(value, file_name, sheet_index)
+    return
+
+def file_from_data(value, file_name: str, sheet_index: int)->None:
+    '''creates an output file using the given name'''
+    data, function = value
+    #file = open_workbook(file_name)
+    #s = file.sheet_by_index(sheet_index)
+    if function in ['newc','polys','mindep','dtree']:
+        return
+    excel.file_setup(data, file_name, sheet_index)
+    return
 
 def print_data(value)->None:
     """prints the data"""
