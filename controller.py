@@ -1,8 +1,8 @@
 # Controller
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  5:00 PM 8/9/15
-# Version       1.6
+# Last Updated  2:00 PM 8/11/15
+# Version       1.7
 
 import UI#, GUI
 import nltk

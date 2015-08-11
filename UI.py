@@ -1,8 +1,8 @@
 # UI
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  5:00 PM 8/9/15
-# Version       1.6
+# Last Updated  2:00 PM 8/11/15
+# Version       1.7
 
 #import controller
 #controller.excel_setup()
@@ -13,10 +13,12 @@ from os.path import exists
 corpora = []
 max_index = 0
 output = 0
+sort_type = 0
 
 menu = """
 Enter a command:
 output   change type of output between shell text and external documentation
+sort     sort the output based on a particular value
 newc     add a new corpus (not working right now)
 listc    lists all available corpora by registered name
 swa      single word analysis
@@ -41,11 +43,14 @@ def setup()->None:
 
 def interface()->(str, int):
     """asks the user what to do and then asks the controller to do it"""
-    global output
+    global output, sort_type
     while True:
         cmd = input(menu).strip().lower()
         if cmd == 'output':
             output = change_output()
+            return (None,None)
+        elif cmd == 'sort':
+            sort_type = sort_change()
             return (None,None)
         elif cmd == 'newc':
             return ('newc', newc())
@@ -89,6 +94,21 @@ def change_output()->int:
             return 2
         else:
             print("Invalid output type, please select from: excel, text, or both")
+
+def sort_change()->str:
+    '''changes how the outputs are ordered'''
+    print("The words will be printed in order followed by their analysis")
+    possibles = ['default','def_count',]#'TASA','AWL','sfi (from Zeno)','d (from Zeno)']
+    print("Possible sort methods: {}".format(possibles))
+    while True:
+        result = input("Please enter the basis for output sorting: ").strip().lower()
+        if result not in possibles:
+            print("This sort method is not valid")
+        break
+    if result == 'default':
+        return 0
+    elif result == 'def_count':
+        return 1
 
 def newc()->('file', str):
     """tell controller to add a new corpus given its name"""
@@ -207,6 +227,7 @@ def dtree()->str:
 
 def output_data(value)->None:
     '''selects between output styles and call the correct function/s'''
+    value = (sort(value[0]), value[1])
     if output != 1:
         print_data(value)
     if output != 0:
@@ -244,8 +265,6 @@ Also, please choose a file type of either .xls or .xlsx (old vs. new excel)
 def file_from_data(value, file_name: str, sheet_index: int)->None:
     '''creates an output file using the given name'''
     data, function = value
-    #file = open_workbook(file_name)
-    #s = file.sheet_by_index(sheet_index)
     if function in ['newc','polys','mindep','dtree']:
         return
     excel.file_setup(data, file_name, sheet_index)
@@ -354,69 +373,14 @@ gr7:  {}\ngr8:  {}\ngr9:  {}\ngr10: {}\ngr11: {}\ngr12: {}\ngr13: {}""".format(
     data[4][14],data[4][15],data[4][16]))
     return
 
+def sort(data)->list:
+    '''uses the current sort method to sort the data'''
+    if sort_type == 0:
+        return data
+    if sort_type == 1:
+        data.sort(key = lambda x: len(x[2][0]), reverse = True)
 
-'''def return_data(data: [str])->None:
-    """displays the data collected in the controller module"""
-    #from nltk
-    print("""
-Total number of tokens:             {}
-Number of unique tokens:            {}
-Richness of the text:               {}
-Count of word's occurences:         {}
-Rate of word's occurence per token: {}
-""".format(data[0][0],data[0][1],data[0][2],data[0][3], data[0][4]))
-    
-    #parts of speech and defintions from wordnet
-    print("Defintions:")
-    for def_index in range(len(data[1][0])):
-          if data[1][1][def_index] == 'n':
-              print("noun: {}".format(data[1][0][def_index]))
-          if data[1][1][def_index] == 'a':
-              print("adjective: {}".format(data[1][0][def_index]))
-          if data[1][1][def_index] == 's':
-              print("satellite adjective: {}".format(data[1][0][def_index]))
-          if data[1][1][def_index] == 'r':
-              print("adverb: {}".format(data[1][0][def_index]))
-          if data[1][1][def_index] == 'v':
-              print("verb: {}".format(data[1][0][def_index]))
-
-    #related words by wordnet
-    print("\nRelated words:")
-    print("Synonyms:")
-    for syn in data[1][2]:
-        print(syn)
-    print("\nAntonyms:")
-    for ant in data[1][3]:
-        print(ant)
-    print("\nHypernyms:")
-    for hyper in data[1][4]:
-        print(hyper)
-    print("\nHyponyms:")
-    for hypo in data[1][5]:
-        print(hypo)
-
-    #Excel data
-    print("\nTASA number: {}".format(data[2][0]))
-    
-    print("\nAOA data:")
-    print("OccurTotal:      {}\nOccurNum:        {}\nFreq_pm:         {}\nRating.Mean:     {}\nRating.SD:       {}\n(unknown value): {}".format(
-        data[2][1][0],data[2][1][1],data[2][1][2],data[2][1][3],data[2][1][4],data[2][1][5]))
-    
-    print("\nAWL value: {}".format(data[2][2]))
-    
-    print("\nSUBTLEX data:")
-    print("""FREQcount:  {}\nCScount:    {}\nFREQlow:    {}\nCDlow:      {}\nSUBTL_WF:   {}\nLog_10(WF): {}
-SUBTL_CD:   {}\nLog_10(CD): {}""".format(data[2][3][0],data[2][3][1],data[2][3][2],data[2][3][3],
-                                       data[2][3][4],data[2][3][5],data[2][3][6],data[2][3][7]))
-    
-    print("\nZeno data:")
-    print("""sfi:  {}\nd:    {}\nu:    {}\nf:    {}\ngr1:  {}\ngr2:  {}\ngr3:  {}\ngr4:  {}\ngr5:  {}\ngr6:  {}
-gr7:  {}\ngr8:  {}\ngr9:  {}\ngr10: {}\ngr11: {}\ngr12: {}\ngr13: {}""".format(
-    data[2][4][0],data[2][4][1],data[2][4][2],data[2][4][3],data[2][4][4],data[2][4][5],data[2][4][6],
-    data[2][4][7],data[2][4][8],data[2][4][9],data[2][4][10],data[2][4][11],data[2][4][12],data[2][4][13],
-    data[2][4][14],data[2][4][15],data[2][4][16]))
-    
-    return'''
+    return data
 
 #parts of speech conversion: ADJ, ADJECTIVE_SATELLITE, ADV, NOUN, VERB = 'a', 's', 'r', 'n', 'v'
 #for synset in wn.synsets('mint', wn.NOUN):
