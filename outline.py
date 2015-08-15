@@ -1,9 +1,12 @@
 """
 Current issues:
 program will not continue until dispersion plot is exited, redo UI here
-program will only display dispersion fo one word at a time in mwa/mwac/mwaxl
+program will only display dispersion fo one word at a time in mwac
 related words auto-prints in inconistant format
 synonyms need work, as do antonyms (maybe add second degree words)
+
+fix the excel output to not ask for a file when using off-use commands
+add option to save certain lists of words (helpful)
 
 
 Needs to:

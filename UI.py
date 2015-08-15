@@ -1,13 +1,14 @@
 # UI
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  2:00 PM 8/11/15
-# Version       1.7
+# Last Updated  12:10 PM 8/15/15
+# Version       1.9
 
 #import controller
 #controller.excel_setup()
 import excel
 import xlrd, xlwt
+from openpyxl import *
 from os.path import exists
 
 corpora = []
@@ -19,13 +20,12 @@ menu = """
 Enter a command:
 output   change type of output between shell text and external documentation
 sort     sort the output based on a particular value
-newc     add a new corpus (not working right now)
+newc     add a new corpus
 listc    lists all available corpora by registered name
 swa      single word analysis
 swac     single word analysis with a corpus
 mwa      multi-word analysis
 mwac     multi-word analysis with a corpus
-mwaxl    multi-word analysis using input from an excel spreadsheet
 polys    polysemy rating for a selection of words
 mindep   mindepth of a selection of words
 dtree    depth tree of a given word (working on making it neater)
@@ -67,14 +67,12 @@ def interface()->(str, int):
             return ('mwa', mwa())
         elif cmd == 'mwac':
             return ('mwac', mwac())
-        elif cmd == 'mwaxl':
-            return ('mwaxl', mwaxl())
         elif cmd == 'polys':
-            return ('polys', polys())
+            return ('polys', mwa())
         elif cmd == 'mindep':
-            return ('mindep', mindep())
+            return ('mindep', mwa())
         elif cmd == 'dtree':
-            return ('dtree', dtree())
+            return ('dtree', swa())
         elif cmd == 'q':
             print("Goodbye")
             return ('quit', None)
@@ -85,7 +83,7 @@ def interface()->(str, int):
 def change_output()->int:
     '''allows user to change the programs output to text and/or excel file'''
     while True:
-        output_type = input("Change output to (excel, shell text (default), both): ").strip().lower()
+        output_type = input("Change output to (excel, default/text/shell text, both): ").strip().lower()
         if output_type in ['text', 'shell text', 'default']:
             return 0
         elif output_type == 'excel':
@@ -98,7 +96,7 @@ def change_output()->int:
 def sort_change()->str:
     '''changes how the outputs are ordered'''
     print("The words will be printed in order followed by their analysis")
-    possibles = ['default','def_count',]#'TASA','AWL','sfi (from Zeno)','d (from Zeno)']
+    possibles = ['default','def_count','alphabetical','length']#'TASA','AWL','sfi (from Zeno)','d (from Zeno)']
     print("Possible sort methods: {}".format(possibles))
     while True:
         result = input("Please enter the basis for output sorting: ").strip().lower()
@@ -109,6 +107,10 @@ def sort_change()->str:
         return 0
     elif result == 'def_count':
         return 1
+    elif result == 'alphabetical':
+        return 2
+    elif result == 'length':
+        return 3
 
 def newc()->('file', str):
     """tell controller to add a new corpus given its name"""
@@ -134,11 +136,13 @@ file is present in the current directory:
 
 def swa()->str:
     """run an analysis on a signle word"""
-    word = input("Please enter a word to analyze: ").strip().lower()
-    return word
+    return input("Please enter a word to analyze: ").strip().lower()
 
 def swac()->(int,str):
     """run an analysis on a signle word based on a corpus"""
+    print('Available corpora:')
+    for c in corpora:
+        print(c)
     while True:
         corpus = input("Please enter an available corpus to refrence by index number: ")
         try:
@@ -154,11 +158,76 @@ def swac()->(int,str):
 
 def mwa()->[str]:
     """run an analysis on several words"""
-    words = input("Please enter a series of words to analyze seperated only by spaces: ").strip().lower().split()
-    return words
+    while True:
+        print("Word sources: text, excel, manual (.txt, .xls/.xlsx, type into console)")
+        word_source = input("Please enter a source for the words to analyze: ").strip().lower()
+        if word_source not in ['text', 'excel', 'manual']:
+            print("This is not a valid word source")
+            continue
+        break
+    if word_source == 'manual':
+        words = input("Please enter a series of words to analyze seperated only by spaces: ").strip().lower().split()
+        return words
+    if word_source == 'excel':
+        return excel_words()
+    if word_source == 'text':
+        return text_words()
 
-def mwac()->(str,[str]):
+def text_words()->[str]:
+    '''takes a text file and returns a list of words'''
+    print("""Please enter the fileid of the text file exactly as it is
+(including the extension), please ensure that the file is present in
+the current folder and that all words seperated by only whitespace
+""")
+    while True:
+        file_name = input("fileid of text file: ").strip()
+        try:
+            file = open(file_name).read().splitlines()
+            break
+        except:
+            print("This text file is not available, please make sure that you typed it correctly")
+            continue
+    result = []
+    for line in file:
+        line = line.strip().lower()
+    if len(file[0]) == 1:
+        result = file
+        return result
+    for line in file:
+        for word in line.split():
+            result.append(word)
+    return result
+
+def excel_words()->[str]:
+    """run an analysis on many words from an excel file"""
+    #global file, sheet
+    print("""Please enter the fileid of the excel file exactly as it is
+(including the extension), please ensure that the file is present in
+the current folder and that all words are listed in the first column
+""")
+    while True:
+        file = input("fileid of excel document: ").strip()
+        sheet = input("Please enter the sheet name to check (by default, Excel uses Sheet1): ").strip()
+        try:
+            file = load_workbook(file)
+            #file = xlrd.open_workbook(str(file))
+            #sheet = file.sheet_by_index(int(sheet))
+            sheet = file.get_sheet_by_name(sheet)
+            break
+        except:
+            print("This excel document or sheet is not available, please make sure that you \ntyped it correctly")
+            continue
+    result = []
+    for pos in range(len(sheet.rows)):
+        result.append(sheet.cell(row = pos + 1, column = 1).value)
+        #result.append(sheet.cell(pos,0).value)
+    return result
+
+def mwac()->(int,[str]):
     """run an analysis on several words based on a corpus"""
+    print('Available corpora:')
+    for c in corpora:
+        print(c)
     while True:
         corpus = input("Please enter an available corpus to refrence by index number: ")
         try:
@@ -169,61 +238,33 @@ def mwac()->(str,[str]):
                 break
         except:
             print("This is not a valid corpus index (valid indicies are 1-{})".format(max_index))
-    words = input("Please enter a series of words to analyze seperated only by one or more spaces: ").strip().lower().split()
-    return (corpus, words)
+    return (corpus, mwa())
 
-def mwaxl()->(str, int):
-    """run an analysis on many words from an excel file"""
-    #global file, sheet
-    print("""Please enter the fileid of the excel file exactly as it is
-(including the extension), please ensure that the file is present in
-the current folder and that all words are listed in the first column
-""")
-    while True:
-        file = input("fileid of excel document: ").strip()
-        sheet = input("Please enter the sheet number to check: ")
-        try:
-            sheet = int(sheet)
-        except:
-            print("Sheet number is not valid")
-            continue
-        if sheet < 0:
-            print("Sheet number cannot be negative")
-            continue
-        try:
-            file = xlrd.open_workbook(str(file))
-            sheet = file.sheet_by_index(int(sheet))
-            break
-        except:
-            print("This excel document or sheet is not available, please make sure that you \ntyped it correctly")
-            continue
-    return (file, sheet)
+#def polys()->str:
+    #'''returns a list of polysemy ratings for a given wordset'''
+    #while True:
+        #print("Word sources: text, manual (currently the only options available)")
+        #word_source = input("Please enter a source for the words to analyze: ").strip().lower()
+        ###result = controller.polysemy(word_source)
+        #if word_source in ['default', 'manual']:
+            #return word_source
+        #else:
+            #print("Invalid word source")
 
-def polys()->str:
-    '''returns a list of polysemy ratings for a given wordset'''
-    while True:
-        print("Word sources: default, manual (currently the only options available)")
-        word_source = input("Please enter a source for the words to analyze: ").strip().lower()
-        #result = controller.polysemy(word_source)
-        if word_source in ['default', 'manual']:
-            return word_source
-        else:
-            print("Invalid word source")
+#def mindep()->str:
+    #'''returns the min depth of all of the given words'''
+    #while True:
+        #print("Word sources: default, manual (currently the only options available)")
+        #word_source = input("Please enter a source for the words to analyze: ").strip().lower()
+        ###result = controller.polysemy(word_source)
+        #if word_source in ['default', 'manual']:
+            #return word_source
+        #else:
+            #print("Invalid word source")
 
-def mindep()->str:
-    '''returns the min depth of all of the given words'''
-    while True:
-        print("Word sources: default, manual (currently the only options available)")
-        word_source = input("Please enter a source for the words to analyze: ").strip().lower()
-        #result = controller.polysemy(word_source)
-        if word_source in ['default', 'manual']:
-            return word_source
-        else:
-            print("Invalid word source")
-
-def dtree()->str:
-    '''returns the depth tree for a given word'''
-    return input("Please enter a word to analyze: ").strip().lower()
+#def dtree()->str:
+    #'''returns the depth tree for a given word'''
+    #return input("Please enter a word to analyze: ").strip().lower()
 
 def output_data(value)->None:
     '''selects between output styles and call the correct function/s'''
@@ -238,28 +279,23 @@ def data_to_file(value)->None:
     print("""
 Warning: for the moment this program cannot append to files,
 only create and overwrite them, please be careful about using existing files
-You can specify a different sheet number to use if you wish to add to a file
+You can specify a different sheet name to use if you wish to add to a file
 
-Also, please choose a file type of either .xls or .xlsx (old vs. new excel)
+Also, please choose a file type of .xlsx (.xls is not currently supported)
+and be sure that the file is not open in another window.
           """)
     while True:
-        file_name = input("Please enter the name of the file you would to craete, including the extension: ")
+        file_name = input("Please enter the name of the file you would to create, including the extension: ")
         print("\n{}\n".format(file_name))
         sure = input("Are you sure this is the file name you wish to use (y/n)").strip().lower()
         if sure not in ['y', 'yes']:
             continue
-        if file_name.split('.')[1] not in ['xls','xlsx']:
+        if file_name.split('.')[1] != 'xlsx':
             print("This file type is not currently supported")
             continue
-        while True:
-            sheet_index = input("Please enter a sheet number: ").strip().lower()
-            try:
-                sheet_index = int(sheet_index)
-                break
-            except:
-                print("Invalid sheet number")
+        sheet_name = input("Please enter a sheet name: ").strip().lower()
         break
-    file_from_data(value, file_name, sheet_index)
+    file_from_data(value, file_name, sheet_name)
     return
 
 def file_from_data(value, file_name: str, sheet_index: int)->None:
@@ -285,7 +321,7 @@ def print_data(value)->None:
             print_nltk(data[0][1])
         print_wordnet(data[0][2])
         print_excel(data[0][3])
-    elif function in ['mwa', 'mwac', 'mwaxl']:
+    elif function in ['mwa', 'mwac']:
         for word in data:
             print("\n{}\nWord: {}".format('*'*80,word[0]))
             if function == 'mwac':
@@ -379,7 +415,10 @@ def sort(data)->list:
         return data
     if sort_type == 1:
         data.sort(key = lambda x: len(x[2][0]), reverse = True)
-
+    if sort_type == 2:
+        data.sort(key = lambda x: x[0])
+    if sort_type == 3:
+        data.sort(key = lambda x: len(x[0]))
     return data
 
 #parts of speech conversion: ADJ, ADJECTIVE_SATELLITE, ADV, NOUN, VERB = 'a', 's', 'r', 'n', 'v'

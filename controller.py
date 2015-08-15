@@ -1,8 +1,8 @@
 # Controller
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  2:00 PM 8/11/15
-# Version       1.7
+# Last Updated  12:10 PM 8/15/15
+# Version       1.9
 
 import UI#, GUI
 import nltk
@@ -20,7 +20,7 @@ if load_NLTK_corpora:
 word = ''
 corpus = 0
 aoa = 'AoA.xlsx'
-awl = 'AWL.xls'
+awl = 'AWL.xlsx'
 subtlex = 'SUBTLEX.xlsx'
 tasa = 'tasa.xlsx'
 zeno = 'Zeno.xlsx'
@@ -71,9 +71,6 @@ def collect_data(in_data)->list:
         data = analyze(other, False)
     if function == 'mwac':
         data = analyze(other[1], True, other[0])
-    if function == 'mwaxl':
-        words = excel_words(other[0], other[1])
-        data = analyze(words, False)
     if function == 'polys':
         data = polysemy(other)
     if function == 'mindep':
@@ -87,11 +84,11 @@ def excel_setup()->None:
     global awl, aoa, tasa, subtlex, zeno
     #I tried to make a for loop for this but it never worked...
     try:
-        awl = xlrd.open_workbook('AWL.xls')
+        awl = xlrd.open_workbook('AWL.xlsx')
         awl = awl.sheet_by_index(0)
         print("1/5")
     except:
-        print("Failed to load file: AWL.xls")
+        print("Failed to load file: AWL.xlsx")
     try:
         aoa = xlrd.open_workbook('AoA.xlsx')
         aoa = aoa.sheet_by_index(0)
@@ -118,14 +115,6 @@ def excel_setup()->None:
         print("Failed to load file: Zeno.xlsx")
     return
 
-def excel_words(file, sheet)->list:
-    '''returns a list of words from an excel file'''
-    #Note: current config does not require file but is included for possible future use
-    result = []
-    for pos in range(sheet.nrows):
-        result.append(sheet.cell(pos,0).value)
-    return result
-
 def corupus_setup(file, name: str)->bool:
     '''sets up a new corpus to be selected from'''
     try:
@@ -144,6 +133,8 @@ def corupus_setup(file, name: str)->bool:
 
 def analyze(words: [str], nltk: bool, corpus_id = 0)->[str]:
     """analyze a given word and report all available data"""
+    #print(words)
+    print("\nGathering data...")
     global corpus
     if corpus_id != 0:
         if corpus_id < 10:
@@ -220,15 +211,15 @@ def wordnet_data(word: str)->[str]:
     #how to find similar words? Doesn't the corpus analysis do this? Hyponyms?
     return result
 
-def polysemy(word_source: str)->list:
+def polysemy(words: [str])->list:
     '''returns a list of polysemy data for a given word set'''
-    if word_source == 'default':
+    '''if word_source == 'default':
         file = open('common words.txt')
         words = file.read().splitlines()
     elif word_source == 'manual':
         print("Please enter a string of words seperated only by spaces: ")
         words = input().strip().lower().split()
-    #words = [w.lower() for w in word_list]
+    #words = [w.lower() for w in word_list]'''
     result = []
     for word in words:
         word_data = [word,0,0,0,0,0]
@@ -248,15 +239,15 @@ def polysemy(word_source: str)->list:
         result.append(word_data)
     return result
 
-def mindepth(word_source)->list:
+def mindepth(words: [str])->list:
     '''returns a list of tuples of a word and its min depth'''
-    #if word_source == 'default':
+    '''#if word_source == 'default':
     if word_source == 'default':
         file = open('common words.txt')
         words = file.read().splitlines()
     elif word_source == 'manual':
         print("Please enter a string of words seperated only by spaces: ")
-        words = input().strip().lower().split()
+        words = input().strip().lower().split()'''
     #words = [w.lower() for w in word_list]
     result = []
     for word in words:
