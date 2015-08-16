@@ -26,14 +26,14 @@ def file_setup(data, file_name: str, sheet_name = '', sheet_index = 0)->None:
     global file, sheet#, col_index
     #file = xlwt.Workbook()
     #sheet = file.add_sheet('Sheet{}'.format(sheet_index))
-    try:
+    try: #file exists, add a new sheet
         file = load_workbook(file_name)
         sheet = file.create_sheet(title = sheet_name)
-    except:
+    except: #file does not exist, rename first sheet
         #try:
-            file = Workbook()
-            sheet = file.active
-            sheet.title = sheet_name
+        file = Workbook()
+        sheet = file.active
+        sheet.title = sheet_name
         #except:
             #print("Something went wrong...")
     sheet.cell(row = 1, column = 1).value = 'Word'

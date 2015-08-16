@@ -7,6 +7,9 @@ synonyms need work, as do antonyms (maybe add second degree words)
 
 fix the excel output to not ask for a file when using off-use commands
 add option to save certain lists of words (helpful)
+excel file opening can be sped up and save memeory using openpyxl,
+    but this is problematic to implement, work on this in excel_test.py
+program crahses when: sorting is set to non-default, output is both or excel, dtree is called
 
 
 Needs to:

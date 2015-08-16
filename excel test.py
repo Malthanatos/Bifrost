@@ -1,11 +1,22 @@
 from openpyxl import *
 
-wb = load_workbook('simple.xlsx')
-s = wb.get_sheet_by_name('Sheet1')
+simple = load_workbook('simple.xlsx', read_only = True)
+simple = simple.get_sheet_by_name('Sheet1')
 
-s.cell(row = 1,column = 1).value = 'light'
-wb.save('simple.xlsx')
+#s.cell(row = 1,column = 1).value = 'light'
+#wb.save('simple.xlsx')
+print(simple)
+print(simple.rows)
 
+#fix this problem to speed up and save memory
+word = 'ship'
+result = 0
+for row in simple.rows:
+    for pos in row:
+        if (word == cell.value):
+            result = cell.value   #AWL rating
+            break
+print(result)
 
 '''print('Sheet:',s.title)
 #print(s.rows)

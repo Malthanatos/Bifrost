@@ -1,13 +1,13 @@
 # UI
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  12:10 PM 8/15/15
-# Version       1.9
+# Last Updated  2:35 PM 8/16/15
+# Version       2.0
 
 #import controller
 #controller.excel_setup()
 import excel
-import xlrd, xlwt
+#import xlrd, xlwt
 from openpyxl import *
 from os.path import exists
 
@@ -125,8 +125,6 @@ file is present in the current directory:
                 print("This file format is not currently supported")
                 continue
             assert exists(file_name)
-            #file = open(file_name, 'r')
-            #file.close()
         except:
             print("This corpus is not available, please make sure that you typed it correctly")
             return newc()

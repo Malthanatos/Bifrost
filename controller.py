@@ -1,20 +1,31 @@
 # Controller
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  12:10 PM 8/15/15
-# Version       1.9
+# Last Updated  2:35 PM 8/16/15
+# Version       2.0
 
 import UI#, GUI
 import nltk
 import xlrd
-import xlwt
+#import xlwt
+from openpyxl import *
 from nltk.corpus import wordnet
 
 #Debugging:
 load_excel_files = True
-load_NLTK_corpora = False
+load_NLTK_corpora = True
+if not load_excel_files:
+    print("""WARNING: You are in non-excel debugging mode,
+this will result in data gathering failures and may result in a crash!""")
+
 if load_NLTK_corpora:
     from nltk.book import *
+    #import nltk.book
+else:
+    print("""WARNING: You are in non-NLTK-corpus debugging mode,
+this may cause program crashes when using mwac/swac!""")
+
+
 
 #global variable declarations:
 word = ''
@@ -26,14 +37,14 @@ tasa = 'tasa.xlsx'
 zeno = 'Zeno.xlsx'
 
 #Note: excel coords act as follows:
-#cell(0,0) -> A-1   and cell(1,10) -> B-11
+#cell(1,1) -> A-1   and cell(2,11) -> B-11
 
 def run()->None:
     """Initializes program"""
     #global corpus
     #may want to load excel files on a case by case basis later on
     if load_excel_files:
-        print("Loading excel files...")
+        print("\nLoading excel files...")
         excel_setup()
         print("Done")
     UI.setup()
@@ -44,9 +55,10 @@ def run()->None:
 Notes: some 2 part words can be analyzed, however, the results
        - of the analysis of such words may be inconsistant depending on
        - whether the input uses a space or an underscore to seperate them
-       entering default as an option when it is available will run the
-       - given function using a set of predetermined common words
-       - (see common words.txt)''')
+       
+       currently, when data from a corpus is loaded using mwac the related
+       - words and dispersion plots will be displayed before any other
+       - data such as definitions and statistics''')
     while True:
         interface_data = UI.interface()
         if interface_data[0] == 'quit':
@@ -111,6 +123,7 @@ def excel_setup()->None:
     try:
         zeno = xlrd.open_workbook('Zeno.xlsx')
         zeno = zeno.sheet_by_index(0)
+        print("5/5")
     except:
         print("Failed to load file: Zeno.xlsx")
     return
@@ -123,12 +136,13 @@ def corupus_setup(file, name: str)->bool:
         index = int(corpora.read().splitlines()[-1].split()[0]) + 1
         listing.write('\n{}\t{}\t{}'.format(index,name,file))
         listing.close()
-        file.close()
+        corpora.close()
         UI.setup()
         #UI.corpora.append('{}\t{}\t{}'.format(index,name,file))
         #UI.max_index = index
     except:
         print("Could not install new corpus...")
+        return False
     return True
 
 def analyze(words: [str], nltk: bool, corpus_id = 0)->[str]:
@@ -139,6 +153,7 @@ def analyze(words: [str], nltk: bool, corpus_id = 0)->[str]:
     if corpus_id != 0:
         if corpus_id < 10:
             corpus = eval('text' + str(corpus_id))
+            #corpus = eval('nltk.book.text' + str(corpus_id))
         else:
             corpus = UI.corpora[corpus_id-1].split('\t')[2]
             corpus = open(corpus, 'r').read()
@@ -165,7 +180,7 @@ def nltk_data(word: str)->[str]:
     result = [None,None,None,None,None]
     #similar seems to auto-print and return None
     #technically part of UI:
-    print("\nRelated words within selected corpus: ")
+    print('\nWords related to "{}" within selected corpus: '.format(word))
     try:
         corpus.similar(word)
     except:
@@ -177,7 +192,7 @@ def nltk_data(word: str)->[str]:
     result[4] = 100 * result[3] / result[0]
     #see UI for more specifics here:
     try:
-        print("\nWord's distribution within the corpus: (see second window)")
+        print("\n{}'s distribution within the corpus: (see second window)".format(word))
         print("\nNote: in current development stage the program cannot continue until the \nfrequency distribution window is closed.")
         corpus.dispersion_plot([word])
     except (ValueError, ImportError):
@@ -274,23 +289,23 @@ def excel_data(word: str)->[str]:
     try:
         result[0] = awl_data(word)
     except:
-        print("\nLoading AWL data failed\n")
+        print('\nLoading AWL data for word: "{}" failed\n'.format(word))
     try:
         result[1] = aoa_data(word)
     except:
-        print("\nLoading AoA data failed\n")
+        print('\nLoading AoA data for word: "{}" failed\n'.format(word))
     try:
         result[2] = tasa_data(word)
     except:
-        print("\nLoading tasa data failed\n")
+        print('\nLoading TASA data for word: "{}" failed\n'.format(word))
     try:
         result[3] = subtlex_data(word)
     except:
-        print("\nLoading SUBTLEX data failed\n")
+        print('\nLoading SUBLTEX data for word: "{}" failed\n'.format(word))
     try:
         result[4] = zeno_data(word)
     except:
-        print("\nLoading Zeno data failed\n")
+        print('\nLoading Zeno data for word: "{}" failed\n'.format(word))
     return result    
 
 def awl_data(word: str)->int:
