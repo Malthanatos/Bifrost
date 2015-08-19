@@ -206,8 +206,8 @@ def wordnet_data(word: str)->[str]:
         return result
     lemmas = wordnet.lemmas(word)
     for synset in wordnet.synsets(word):
-        if synset.name().split('.')[0] != word:
-            continue
+        #if synset.name().split('.')[0] != word:
+            #continue
         result[0].append(synset.definition())
         result[1].append(synset.pos())
     result[2] = word_info.lemma_names()
@@ -233,8 +233,8 @@ def polysemy(words: [str])->list:
         word_data = [word,0,0,0,0,0]
         word_info = wordnet.synsets(word)
         for synset in word_info:
-            if synset.name().split('.')[0] != word:
-                continue
+            #if synset.name().split('.')[0] != word:
+                #continue
             if synset.pos() == 'n':
                 word_data[1] += 1
             if synset.pos() == 'a':
@@ -256,8 +256,8 @@ def mindepth(words: [str])->list:
         word_data = [word,-1,-1,-1,-1,-1]
         word_info = wordnet.synsets(word)
         for index in range(len(word_info)):
-            if word_info[index].name().split('.')[0] != word:
-                continue
+            #if word_info[index].name().split('.')[0] != word:
+                #continue
             if word_info[index].pos() == 'n' and word_data[1] == -1:
                 word_data[1] = word_info[index].min_depth()
             if word_info[index].pos() == 'a' and word_data[2] == -1:
@@ -281,8 +281,8 @@ def polys_mindep(words: [str])->list:
         word_data = [word,0,0,0,0,0,-1,-1,-1,-1,-1]
         word_info = wordnet.synsets(word)
         for index in range(len(word_info)):
-            if word_info[index].name().split('.')[0] != word:
-                continue
+            #if word_info[index].name().split('.')[0] != word:
+                #continue
             if word_info[index].pos() == 'n':
                 if word_data[6] == -1:
                     word_data[6] = word_info[index].min_depth()
