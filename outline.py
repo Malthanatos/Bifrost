@@ -11,6 +11,12 @@ excel file opening can be sped up and save memeory using openpyxl,
     but this is problematic to implement, work on this in excel_test.py
 program crahses when: sorting is set to non-default, output is both or excel, dtree is called
 
+get mindep and polys for large input to excel
+check google ngrams and try to use the raw data
+get mindep and dtree to work with most common word, print the
+    parts of speech and ask which one to work with
+    ie: when using mindep return one for each part of speech (the first)
+
 
 Needs to:
 

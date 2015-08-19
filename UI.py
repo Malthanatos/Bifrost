@@ -1,13 +1,10 @@
 # UI
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  2:35 PM 8/16/15
-# Version       2.0
+# Last Updated  2:50 PM 8/18/15
+# Version       2.2
 
-#import controller
-#controller.excel_setup()
 import excel
-#import xlrd, xlwt
 from openpyxl import *
 from os.path import exists
 
@@ -28,6 +25,7 @@ mwa      multi-word analysis
 mwac     multi-word analysis with a corpus
 polys    polysemy rating for a selection of words
 mindep   mindepth of a selection of words
+pol_min  runs both polysemy and mindepth analysis of a selection of words
 dtree    depth tree of a given word (working on making it neater)
 
 q        quit
@@ -71,6 +69,8 @@ def interface()->(str, int):
             return ('polys', mwa())
         elif cmd == 'mindep':
             return ('mindep', mwa())
+        elif cmd == 'pol_min':
+            return ('pol_min', mwa())
         elif cmd == 'dtree':
             return ('dtree', swa())
         elif cmd == 'q':
@@ -198,7 +198,6 @@ the current folder and that all words seperated by only whitespace
 
 def excel_words()->[str]:
     """run an analysis on many words from an excel file"""
-    #global file, sheet
     print("""Please enter the fileid of the excel file exactly as it is
 (including the extension), please ensure that the file is present in
 the current folder and that all words are listed in the first column
@@ -208,8 +207,6 @@ the current folder and that all words are listed in the first column
         sheet = input("Please enter the sheet name to check (by default, Excel uses Sheet1): ").strip()
         try:
             file = load_workbook(file)
-            #file = xlrd.open_workbook(str(file))
-            #sheet = file.sheet_by_index(int(sheet))
             sheet = file.get_sheet_by_name(sheet)
             break
         except:
@@ -218,7 +215,6 @@ the current folder and that all words are listed in the first column
     result = []
     for pos in range(len(sheet.rows)):
         result.append(sheet.cell(row = pos + 1, column = 1).value)
-        #result.append(sheet.cell(pos,0).value)
     return result
 
 def mwac()->(int,[str]):
@@ -237,32 +233,6 @@ def mwac()->(int,[str]):
         except:
             print("This is not a valid corpus index (valid indicies are 1-{})".format(max_index))
     return (corpus, mwa())
-
-#def polys()->str:
-    #'''returns a list of polysemy ratings for a given wordset'''
-    #while True:
-        #print("Word sources: text, manual (currently the only options available)")
-        #word_source = input("Please enter a source for the words to analyze: ").strip().lower()
-        ###result = controller.polysemy(word_source)
-        #if word_source in ['default', 'manual']:
-            #return word_source
-        #else:
-            #print("Invalid word source")
-
-#def mindep()->str:
-    #'''returns the min depth of all of the given words'''
-    #while True:
-        #print("Word sources: default, manual (currently the only options available)")
-        #word_source = input("Please enter a source for the words to analyze: ").strip().lower()
-        ###result = controller.polysemy(word_source)
-        #if word_source in ['default', 'manual']:
-            #return word_source
-        #else:
-            #print("Invalid word source")
-
-#def dtree()->str:
-    #'''returns the depth tree for a given word'''
-    #return input("Please enter a word to analyze: ").strip().lower()
 
 def output_data(value)->None:
     '''selects between output styles and call the correct function/s'''
@@ -291,7 +261,7 @@ and be sure that the file is not open in another window.
         if file_name.split('.')[1] != 'xlsx':
             print("This file type is not currently supported")
             continue
-        sheet_name = input("Please enter a sheet name: ").strip().lower()
+        sheet_name = input("Please enter a sheet name: ").strip()
         break
     file_from_data(value, file_name, sheet_name)
     return
@@ -299,7 +269,7 @@ and be sure that the file is not open in another window.
 def file_from_data(value, file_name: str, sheet_index: int)->None:
     '''creates an output file using the given name'''
     data, function = value
-    if function in ['newc','polys','mindep','dtree']:
+    if function in ['newc','dtree']:
         return
     excel.file_setup(data, file_name, sheet_index)
     return
@@ -313,31 +283,36 @@ def print_data(value)->None:
             print("New corpus has been sucesfully installed")
         else:
             print("New corpus could not be installed...")
-    elif function in ['swa', 'swac']:
+    if function in ['swa', 'swac']:
         print("\nWord: {}".format(data[0][0]))
         if function == 'swac':
             print_nltk(data[0][1])
         print_wordnet(data[0][2])
         print_excel(data[0][3])
-    elif function in ['mwa', 'mwac']:
+    if function in ['mwa', 'mwac']:
         for word in data:
             print("\n{}\nWord: {}".format('*'*80,word[0]))
             if function == 'mwac':
                 print_nltk(word[1])
             print_wordnet(word[2])
             print_excel(word[3])
-    elif function == 'polys':
-        print("Number of part of speech definitons for each word:")
+    if function == 'polys' or function == 'pol_min':
+        print("\nNumber of defintions per part of speech for each word:")
         print("\nWord                Noun  Adj  SatAdj  Adv  Verb")
         for word in data:
             print("{:18}{:6}{:5}{:8}{:5}{:6}".format(word[0],word[1],word[2],word[3],word[4],word[5]))
-    elif function == 'mindep':
-        print("Min depth of the most common definition for each word:")
-        print("\nWord           Min depth")
-        for word in data:
-            print("{:18}{:6}".format(word[0],word[1]))
-    elif function == 'dtree':
-        print("Multiple entires on the same line are equivalent")
+    if function == 'mindep' or function == 'pol_min':
+        print("""\nMin depth of the first, or most common definition for each part of
+speech of each word; -1 signifies that no defintion of that type was found:""")
+        print("\nWord  Min depth as: Noun  Adj  SatAdj  Adv  Verb")
+        if function == 'pol_min':
+            for word in data:
+                print("{:18}{:6}{:5}{:8}{:5}{:6}".format(word[0],word[6],word[7],word[8],word[9],word[10]))
+        else:
+            for word in data:
+                print("{:18}{:6}{:5}{:8}{:5}{:6}".format(word[0],word[1],word[2],word[3],word[4],word[5]))
+    if function == 'dtree':
+        print("\nMultiple entires on the same line are equivalent")
         from pprint import pprint
         pprint(data)
     return

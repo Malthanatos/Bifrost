@@ -1,26 +1,24 @@
 # Controller
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  2:35 PM 8/16/15
-# Version       2.0
+# Last Updated  2:50 PM 8/18/15
+# Version       2.2
 
-import UI#, GUI
+import UI
 import nltk
 import xlrd
-#import xlwt
 from openpyxl import *
 from nltk.corpus import wordnet
 
 #Debugging:
-load_excel_files = True
-load_NLTK_corpora = True
+load_excel_files = False
+load_NLTK_corpora = False
 if not load_excel_files:
     print("""WARNING: You are in non-excel debugging mode,
 this will result in data gathering failures and may result in a crash!""")
 
 if load_NLTK_corpora:
     from nltk.book import *
-    #import nltk.book
 else:
     print("""WARNING: You are in non-NLTK-corpus debugging mode,
 this may cause program crashes when using mwac/swac!""")
@@ -48,9 +46,6 @@ def run()->None:
         excel_setup()
         print("Done")
     UI.setup()
-    #if corpus != None:
-        #corpus = eval(corpus)
-    #UI.return_data(analyze(word))
     print('''
 Notes: some 2 part words can be analyzed, however, the results
        - of the analysis of such words may be inconsistant depending on
@@ -70,7 +65,6 @@ Notes: some 2 part words can be analyzed, however, the results
 
 def collect_data(in_data)->list:
     """collects the data requested"""
-    #print(word)
     function = in_data[0]
     other = in_data[1]
     if function == 'newc':
@@ -87,6 +81,8 @@ def collect_data(in_data)->list:
         data = polysemy(other)
     if function == 'mindep':
         data = mindepth(other)
+    if function == 'pol_min':
+        data = polys_mindep(other)
     if function == 'dtree':
         data = depth_tree(other)
     return (data, function)
@@ -138,8 +134,6 @@ def corupus_setup(file, name: str)->bool:
         listing.close()
         corpora.close()
         UI.setup()
-        #UI.corpora.append('{}\t{}\t{}'.format(index,name,file))
-        #UI.max_index = index
     except:
         print("Could not install new corpus...")
         return False
@@ -147,13 +141,11 @@ def corupus_setup(file, name: str)->bool:
 
 def analyze(words: [str], nltk: bool, corpus_id = 0)->[str]:
     """analyze a given word and report all available data"""
-    #print(words)
-    print("\nGathering data...")
     global corpus
+    print("\nGathering data...")
     if corpus_id != 0:
         if corpus_id < 10:
             corpus = eval('text' + str(corpus_id))
-            #corpus = eval('nltk.book.text' + str(corpus_id))
         else:
             corpus = UI.corpora[corpus_id-1].split('\t')[2]
             corpus = open(corpus, 'r').read()
@@ -214,16 +206,16 @@ def wordnet_data(word: str)->[str]:
         return result
     lemmas = wordnet.lemmas(word)
     for synset in wordnet.synsets(word):
+        if synset.name().split('.')[0] != word:
+            continue
         result[0].append(synset.definition())
         result[1].append(synset.pos())
-        #how to access part of speech?
     result[2] = word_info.lemma_names()
     for lemma in lemmas:
         for word in lemma.antonyms():
             result[3].add(word.name())
     result[4] = (word.name().split('.')[0] for word in word_info.hyponyms())
     result[5] = (word.name().split('.')[0] for word in word_info.hypernyms())
-    #how to find similar words? Doesn't the corpus analysis do this? Hyponyms?
     return result
 
 def polysemy(words: [str])->list:
@@ -235,12 +227,14 @@ def polysemy(words: [str])->list:
         print("Please enter a string of words seperated only by spaces: ")
         words = input().strip().lower().split()
     #words = [w.lower() for w in word_list]'''
+    print("\nGathering data...")
     result = []
     for word in words:
         word_data = [word,0,0,0,0,0]
         word_info = wordnet.synsets(word)
         for synset in word_info:
-            #result.append(sysnest.pos())
+            if synset.name().split('.')[0] != word:
+                continue
             if synset.pos() == 'n':
                 word_data[1] += 1
             if synset.pos() == 'a':
@@ -256,21 +250,65 @@ def polysemy(words: [str])->list:
 
 def mindepth(words: [str])->list:
     '''returns a list of tuples of a word and its min depth'''
-    '''#if word_source == 'default':
-    if word_source == 'default':
-        file = open('common words.txt')
-        words = file.read().splitlines()
-    elif word_source == 'manual':
-        print("Please enter a string of words seperated only by spaces: ")
-        words = input().strip().lower().split()'''
-    #words = [w.lower() for w in word_list]
+    print("\nGathering data...")
     result = []
     for word in words:
-        result.append((word,wordnet.synsets(word)[0].min_depth()))
+        word_data = [word,-1,-1,-1,-1,-1]
+        word_info = wordnet.synsets(word)
+        for index in range(len(word_info)):
+            if word_info[index].name().split('.')[0] != word:
+                continue
+            if word_info[index].pos() == 'n' and word_data[1] == -1:
+                word_data[1] = word_info[index].min_depth()
+            if word_info[index].pos() == 'a' and word_data[2] == -1:
+                word_data[2] = word_info[index].min_depth()
+            if word_info[index].pos() == 's' and word_data[3] == -1:
+                word_data[3] = word_info[index].min_depth()
+            if word_info[index].pos() == 'r' and word_data[4] == -1:
+                word_data[4] = word_info[index].min_depth()
+            if word_info[index].pos() == 'v' and word_data[5] == -1:
+                word_data[5] = word_info[index].min_depth()
+        result.append(word_data)
+    return result
+
+def polys_mindep(words: [str])->list:
+    '''returns a list of lists of words and their depth and polys'''
+    #I could shorten this by calling both and merging them, but calling synsets is expensive
+    #  and I don't want to do it twice if I can help it
+    print("\nGathering data...")
+    result = []
+    for word in words:
+        word_data = [word,0,0,0,0,0,-1,-1,-1,-1,-1]
+        word_info = wordnet.synsets(word)
+        for index in range(len(word_info)):
+            if word_info[index].name().split('.')[0] != word:
+                continue
+            if word_info[index].pos() == 'n':
+                if word_data[6] == -1:
+                    word_data[6] = word_info[index].min_depth()
+                word_data[1] += 1
+            if word_info[index].pos() == 'a':
+                if word_data[7] == -1:
+                    word_data[7] = word_info[index].min_depth()
+                word_data[2] += 1
+            if word_info[index].pos() == 's':
+                if word_data[8] == -1:
+                    word_data[8] = word_info[index].min_depth()
+                word_data[3] += 1
+            if word_info[index].pos() == 'r':
+                if word_data[9] == -1:
+                    word_data[9] = word_info[index].min_depth()
+                word_data[4] += 1
+            if word_info[index].pos() == 'v':
+                if word_data[10] == -1:
+                    word_data[10] = word_info[index].min_depth()
+                word_data[5] += 1
+        result.append(word_data)
     return result
 
 def depth_tree(word)->str:
     '''returns the word's depth tree'''
+    print("\nGathering data...")
     word = wordnet.synsets(word)[0]
     hyp = lambda w:w.hypernyms()
     return word.tree(hyp)
