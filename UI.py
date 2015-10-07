@@ -214,8 +214,10 @@ the current folder and that all words are listed in the first column
             continue
     result = []
     for pos in range(len(sheet.rows)):
-        result.append(sheet.cell(row = pos + 1, column = 1).value)
-    return result
+        try:
+            result.append(str(sheet.cell(row = pos + 1, column = 1).value))
+        except:
+            pass    return result
 
 def mwac()->(int,[str]):
     """run an analysis on several words based on a corpus"""
