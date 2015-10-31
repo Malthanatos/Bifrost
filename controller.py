@@ -1,8 +1,8 @@
 # Controller
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  2:50 PM 8/18/15
-# Version       2.2
+# Last Updated  12:45 PM 10/31/15
+# Version       2.3
 
 import UI
 import nltk
@@ -308,10 +308,25 @@ def polys_mindep(words: [str])->list:
 
 def depth_tree(word)->str:
     '''returns the word's depth tree'''
+    print("Note: only nouns have dtrees, so only noun defintions are displayed")
     print("\nGathering data...")
-    word = wordnet.synsets(word)[0]
-    hyp = lambda w:w.hypernyms()
-    return word.tree(hyp)
+    #word, defintions, pos, dtrees
+    result = ['',[],[],[]]
+    result[0] = word
+    word_info = wordnet.synsets(word)
+    if (len(word_info) > 0):
+        word_info = word_info[0]
+    else:
+        return result
+    for synset in wordnet.synsets(word):
+        result[1].append(synset.definition())
+        result[2].append(synset.pos())
+        hyp = lambda w:w.hypernyms()
+        result[3].append(synset.tree(hyp))
+    return result
+    #word = wordnet.synsets(word)[0]
+    #hyp = lambda w:w.hypernyms()
+    #return word.tree(hyp)
 
 #Note: excel data is not optimally formatted, so linear search is used
 #      this may be changed to binary search later on when the files are in alphabetical order

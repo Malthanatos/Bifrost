@@ -1,7 +1,7 @@
 # UI
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  2:50 PM 8/18/15
+# Last Updated  12:45 PM 10/31/15
 # Version       2.2
 
 import excel
@@ -31,6 +31,23 @@ dtree    depth tree of a given word (working on making it neater)
 q        quit
 
 command: """
+
+#experimental shortcut:
+"""def pos(data)->[str]:
+    '''returns a list of strings corresponding to the appropriate part of speech'''
+    result = []
+    for def_index in range(len(data[1])):
+        if data[2][def_index] == 'n':
+            result.append("noun")
+        if data[2][def_index] == 'a':
+            result.append("adjective")
+        if data[2][def_index] == 's':
+            result.append("satellite adjective")
+        if data[2][def_index] == 'r':
+            result.append("adverb")
+        if data[2][def_index] == 'v':
+            result.append("verb")
+    return result"""
 
 def setup()->None:
     '''sets up the user interface'''
@@ -315,9 +332,7 @@ speech of each word; -1 signifies that no defintion of that type was found:""")
             for word in data:
                 print("{:18}{:6}{:5}{:8}{:5}{:6}".format(word[0],word[1],word[2],word[3],word[4],word[5]))
     if function == 'dtree':
-        print("\nMultiple entires on the same line are equivalent")
-        from pprint import pprint
-        pprint(data)
+        print_dtree(data)
     return
 
 def print_nltk(data)->None:
@@ -383,6 +398,47 @@ gr7:  {}\ngr8:  {}\ngr9:  {}\ngr10: {}\ngr11: {}\ngr12: {}\ngr13: {}""".format(
     data[4][0],data[4][1],data[4][2],data[4][3],data[4][4],data[4][5],data[4][6],
     data[4][7],data[4][8],data[4][9],data[4][10],data[4][11],data[4][12],data[4][13],
     data[4][14],data[4][15],data[4][16]))
+    return
+
+def print_dtree(data):
+    '''prints dtree data'''
+    from pprint import pprint
+    d_count = 0
+    if (len(data[1]) > 1):
+        print("Multiple definitions for the word {} detected: \n".format(data[0]))
+        print("Defintions:")
+        for def_index in range(len(data[1])):
+            if data[2][def_index] == 'n':
+                print("{}: noun: {}".format(def_index, data[1][def_index]))
+                d_count = d_count + 1
+        while True:
+            action = input('\nWhich dtree would you like (choose an index or say "all"): ')
+            if action == 'all':
+                print("\nNote: multiple entires on the same line are equivalent")
+                for def_index in range(d_count):
+                    print("\nDtree of '{}' as defined as: {}".format(data[0],data[1][def_index]))
+                    pprint(data[3][def_index])
+                return
+            else:
+                try:
+                    action = int(action)
+                    if (action >= d_count):
+                        raise fail
+                    dtree = data[3][int(action)]
+                    #in this order to make the note only appear if it works
+                    print("\nNote: multiple entires on the same line are equivalent")
+                    print("\nDtree of '{}' as defined as: {}".format(data[0],data[1][action]))
+                    pprint(dtree)
+                    return
+                except:
+                    print('This index is either invalid or not "all"')
+    elif (len(data[1]) == 1):
+        print('Only 1 defintion of the word "{}" wss found: '.format(data[0]))
+        print("\nNote: multiple entires on the same line are equivalent")
+        print("\nDtree of '{}' as defined as: {}".format(data[0],data[1][def_index]))
+        pprint(data[3][0])
+    else:
+        print('No defintions for the word "{}" were found...'.format(data[0]))
     return
 
 def sort(data)->list:
