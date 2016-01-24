@@ -1,8 +1,8 @@
 # Controller
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  12:45 PM 10/31/15
-# Version       2.3
+# Last Updated  1:45 PM 1/24/16
+# Version       2.4
 
 import UI
 import nltk
@@ -77,6 +77,8 @@ def collect_data(in_data)->list:
         data = analyze(other, False)
     if function == 'mwac':
         data = analyze(other[1], True, other[0])
+    if function == 'dwsa':
+        data = dual_word(other)
     if function == 'polys':
         data = polysemy(other)
     if function == 'mindep':
@@ -217,6 +219,56 @@ def wordnet_data(word: str)->[str]:
     result[4] = (word.name().split('.')[0] for word in word_info.hyponyms())
     result[5] = (word.name().split('.')[0] for word in word_info.hypernyms())
     return result
+
+def dual_word(words: [str])->list:
+    '''returns a list of word similarities'''
+    print("\nGathering data...")
+    results = []
+    similarities = []
+    #can't say if word1 == None or ''
+    on_even = False
+    valid = True
+    #functions take synsets
+    #Need wordnet_ic.ic()
+    #Currently, ic is WIP and requires corpus
+    functions = [wordnet.lch_similarity, wordnet.wup_similarity, wordnet.path_similarity]
+    #ic_functions = [wordnet.jcn_similarity, wordnet.lin_similarity, wordnet.res_similarity]
+    for word in words:
+        similarities.append(word)
+        if not on_even:
+            try:
+                word1 = wordnet.synsets(word)[0]
+                valid = True
+            except:
+                #Invalid word:
+                valid = False
+                continue
+            on_even = True
+        #word -> word2
+        else:
+            if not valid:
+                similarities = [word,similarities[-1],0,0,0]
+                results.append(similarities)
+                similrities = []
+                on_even = False
+                valid = True
+                continue
+            try:
+                word = wordnet.synsets(word)[0]
+            except:
+                #Invaid word, skip this
+                on_even = False
+                similarities = [similarities[0],similarities[1],0,0,0]
+                results.append(similarities)
+                similarities = []
+                continue
+            for f in functions:
+                similarities.append(f(word1,word))
+            #similarities.append(wordnet.lch_similarity(word1,word))
+            on_even = False
+            results.append(similarities)
+            similarities = []
+    return results
 
 def polysemy(words: [str])->list:
     '''returns a list of polysemy data for a given word set'''

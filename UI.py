@@ -1,8 +1,8 @@
 # UI
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  12:45 PM 10/31/15
-# Version       2.2
+# Last Updated  1:45 PM 1/24/16
+# Version       2.4
 
 import excel
 from openpyxl import *
@@ -12,6 +12,7 @@ corpora = []
 max_index = 0
 output = 0
 sort_type = 0
+dual = False
 
 menu = """
 Enter a command:
@@ -23,6 +24,7 @@ swa      single word analysis
 swac     single word analysis with a corpus
 mwa      multi-word analysis
 mwac     multi-word analysis with a corpus
+dwsa     dual-word similarity analysis
 polys    polysemy rating for a selection of words
 mindep   mindepth of a selection of words
 pol_min  runs both polysemy and mindepth analysis of a selection of words
@@ -58,7 +60,8 @@ def setup()->None:
 
 def interface()->(str, int):
     """asks the user what to do and then asks the controller to do it"""
-    global output, sort_type
+    global output, sort_type, dual
+    dual = False
     while True:
         cmd = input(menu).strip().lower()
         if cmd == 'output':
@@ -82,6 +85,9 @@ def interface()->(str, int):
             return ('mwa', mwa())
         elif cmd == 'mwac':
             return ('mwac', mwac())
+        elif cmd == 'dwsa':
+            dual = True
+            return ('dwsa', mwa())
         elif cmd == 'polys':
             return ('polys', mwa())
         elif cmd == 'mindep':
@@ -181,7 +187,15 @@ def mwa()->[str]:
             continue
         break
     if word_source == 'manual':
-        words = input("Please enter a series of words to analyze seperated only by spaces: ").strip().lower().split()
+        if not dual:
+            words = input("Please enter a series of words to analyze seperated only by spaces: ").strip().lower().split()
+        else:
+            while(True):
+                words = input("Please enter pairs of words to analyze seperated only by spaces: ").strip().lower().split()
+                if len(words)%2 != 0:
+                    print("There an even number of words for this function")
+                else:
+                    break
         return words
     if word_source == 'excel':
         return excel_words()
@@ -233,9 +247,11 @@ the current folder and that all words are listed in the first column
     for pos in range(len(sheet.rows)):
         try:
             result.append(str(sheet.cell(row = pos + 1, column = 1).value))
+            if dual:
+                result.append(str(sheet.cell(row = pos + 1, column = 2).value))
         except:
-            pass    
-        return result
+            pass
+    return result
 
 def mwac()->(int,[str]):
     """run an analysis on several words based on a corpus"""
@@ -316,6 +332,10 @@ def print_data(value)->None:
                 print_nltk(word[1])
             print_wordnet(word[2])
             print_excel(word[3])
+    if function == 'dwsa':
+        print("\nWord 1                Word 2\nSimilarity (LCH, WUP, Path)")
+        for word in data:
+           print("\n{:18}{:18}\n{}   {}   {}".format(word[0],word[1],word[2],word[3],word[4])) 
     if function == 'polys' or function == 'pol_min':
         print("\nNumber of defintions per part of speech for each word:")
         print("\nWord                Noun  Adj  SatAdj  Adv  Verb")

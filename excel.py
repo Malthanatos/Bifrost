@@ -1,8 +1,8 @@
 # Excel
 # Author :      Nathan Krueger
 # Created       11:45 AM 8/9/15
-# Last Updated  2:50 PM 8/18/15
-# Version       2.5
+# Last Updated  1:30 PM 1/24/16
+# Version       2.6
 
 from openpyxl import *
 
@@ -21,6 +21,8 @@ def file_setup(data, file_name: str, sheet_name = '', sheet_index = 0)->None:
         sheet.title = sheet_name
     if len(data[0]) == 11:
         polys_mindep_setup(data)
+    elif len(data[0]) == 5:
+        similarity(data)
     else:
         excel_based_setup(data)
     file.save(file_name)
@@ -56,6 +58,19 @@ def excel_based_setup(data)->None:
     write_excel(data)
     return
 
+def similarity(data)->None:
+    ''''sets up existing spreadsheet of word pairs to '''
+    sheet.cell(row = 1, column = 1).value = 'Word 1'
+    sheet.cell(row = 1, column = 2).value = 'Word 2'
+    sheet.cell(row = 1, column = 3).value = 'LCH'
+    sheet.cell(row = 1, column = 4).value = 'WUP'
+    sheet.cell(row = 1, column = 5).value = 'Path'
+    #sheet.cell(row = 1, column = 6).value = 'JCN'
+    #sheet.cell(row = 1, column = 7).value = 'LIN'
+    #sheet.cell(row = 1, column = 8).value = 'Res'
+    write_sim(data)
+    return
+
 def write_excel(data)->None:
     '''writes excel data to an excel file'''
     index = 2
@@ -88,4 +103,19 @@ def write_polys_mindep(data)->None:
         sheet.cell(row = index, column = 10).value = word[9]
         sheet.cell(row = index, column = 11).value = word[10]
         index += 1
+    return
+
+def write_sim(data)->None:
+    '''writes similarity data to file'''
+    index = 2
+    for word in data:
+        sheet.cell(row = index, column = 1).value = word[0]
+        sheet.cell(row = index, column = 2).value = word[1]
+        sheet.cell(row = index, column = 3).value = word[2]
+        sheet.cell(row = index, column = 4).value = word[3]
+        sheet.cell(row = index, column = 5).value = word[4]
+        #sheet.cell(row = index, column = 6).value = word[5]
+        #sheet.cell(row = index, column = 7).value = word[6]
+        #sheet.cell(row = index, column = 8).value = word[7]
+        index +=1
     return

@@ -1,31 +1,50 @@
 # Testing
 # Author :      Nathan Krueger
 # Created       4:30 PM 7/16/15
-# Last Updated  3:30 PM 7/23/15
-# Version       0.5
+# Last Updated  --
+# Version       --
 
-import nltk
-import xlrd
-import xlwt
-#from nltk.book import *
-from nltk.corpus import wordnet
+#import nltk
+#import xlrd
+#import xlwt
+#from nltk.corpus import brown
+from nltk.corpus import wordnet, wordnet_ic
 
 sheet = ''
 
 def run():
+    #corpus_id = 1
+    #corpus = eval('text' + str(corpus_id))
     #texts() or sents() for material list
     #text1 -> name of text
-    global sheet
-    
-    workbook = xlrd.open_workbook('tasa.xlsx')
-    sheet = workbook.sheet_by_index(0)
-    run2()
+    #global sheet
+    #ic = wordnet_ic.ic(brown)
+    #print(ic)
+
+    #GET IC TO WORK
+
+    word1 = wordnet.synsets('chair')[0]
+    word2 = wordnet.synsets('table')[0]
+    functions = [wordnet.lch_similarity, wordnet.path_similarity, wordnet.wup_similarity]
+    for f in functions:
+        print(f(word1,word2))
+    #print(wordnet.lch_similarity(word1,word2))
+    #print(wordnet.wup_similarity(word1,word2))
+    #print(wordnet.path_similarity(word1,word2))
+    #print(wordnet.lin_similarity(word1,word2,ic))
+    #print(wordnet.res_similarity(word1,word2,ic))
+    #print(wordnet.jcn_similarity(word1,word2,ic))
+    #print(wordnet.lch_similarity(word1,word2))
+    #workbook = xlrd.open_workbook('tasa.xlsx')
+    #sheet = workbook.sheet_by_index(0)
+    #run2()
+    print('Done')
     return
 
 def run2():
-    for value in sheet.col_values(0):
-        if value[0] == 'd':
-            print(value)
+    #for value in sheet.col_values(0):
+        #if value[0] == 'd':
+            #print(value)
     '''word = 'whale'
     result = [[],[],[],set(),[]]
     word_info = wordnet.synsets(word)[0]
