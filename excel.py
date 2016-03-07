@@ -1,8 +1,8 @@
 # Excel
 # Author :      Nathan Krueger
 # Created       11:45 AM 8/9/15
-# Last Updated  1:30 PM 1/24/16
-# Version       2.6
+# Last Updated  5:00 PM 3/6/16
+# Version       2.7
 
 from openpyxl import *
 
@@ -16,13 +16,19 @@ def file_setup(data, file_name: str, sheet_name = '', sheet_index = 0)->None:
         file = load_workbook(file_name)
         sheet = file.create_sheet(title = sheet_name)
     except: #file does not exist, rename first sheet
-        file = Workbook()
-        sheet = file.active
-        sheet.title = sheet_name
+        try:
+            file = Workbook()
+            sheet = file.active
+            sheet.title = sheet_name
+        except:
+            print("Err: make sure that the file is closed if it exists!")
+            file_setup(data, file_name, sheet_name)
     if len(data[0]) == 11:
         polys_mindep_setup(data)
     elif len(data[0]) == 5:
         similarity(data)
+    elif len(data[0]) == 7:
+        similarity_BSSA(data)
     else:
         excel_based_setup(data)
     file.save(file_name)
@@ -71,6 +77,18 @@ def similarity(data)->None:
     write_sim(data)
     return
 
+def similarity_BSSA(data)->None:
+    ''''sets up existing spreadsheet of word pairs to '''
+    sheet.cell(row = 1, column = 1).value = 'Word 1'
+    sheet.cell(row = 1, column = 2).value = 'Word 2'
+    sheet.cell(row = 1, column = 3).value = 'LCH'
+    sheet.cell(row = 1, column = 4).value = 'WUP'
+    sheet.cell(row = 1, column = 5).value = 'Path'
+    sheet.cell(row = 1, column = 6).value = 'Word 1 Definition'
+    sheet.cell(row = 1, column = 7).value = 'Word 2 Definition'
+    write_sim_BSSA(data)
+    return
+
 def write_excel(data)->None:
     '''writes excel data to an excel file'''
     index = 2
@@ -117,5 +135,19 @@ def write_sim(data)->None:
         #sheet.cell(row = index, column = 6).value = word[5]
         #sheet.cell(row = index, column = 7).value = word[6]
         #sheet.cell(row = index, column = 8).value = word[7]
+        index +=1
+    return
+
+def write_sim_BSSA(data)->None:
+    '''writes BSSA similarity data to file'''
+    index = 2
+    for word in data:
+        sheet.cell(row = index, column = 1).value = word[0]
+        sheet.cell(row = index, column = 2).value = word[1]
+        sheet.cell(row = index, column = 3).value = word[2]
+        sheet.cell(row = index, column = 4).value = word[3]
+        sheet.cell(row = index, column = 5).value = word[4]
+        sheet.cell(row = index, column = 6).value = word[5]
+        sheet.cell(row = index, column = 7).value = word[6]
         index +=1
     return

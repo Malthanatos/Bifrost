@@ -4,11 +4,15 @@
 # Last Updated  --
 # Version       --
 
-#import nltk
+import nltk
 #import xlrd
 #import xlwt
-#from nltk.corpus import brown
-from nltk.corpus import wordnet, wordnet_ic
+from nltk.corpus import brown
+from nltk.corpus import wordnet
+from nltk.collocations import BigramCollocationFinder as bcf
+
+#see http://stackoverflow.com/questions/21165702/nltk-collocations-for-specific-words
+#see https://blogs.princeton.edu/etc/files/2014/03/Text-Analysis-with-NLTK-Cheatsheet.pdf
 
 sheet = ''
 
@@ -20,14 +24,20 @@ def run():
     #global sheet
     #ic = wordnet_ic.ic(brown)
     #print(ic)
-
     #GET IC TO WORK
-
-    word1 = wordnet.synsets('chair')[0]
-    word2 = wordnet.synsets('table')[0]
-    functions = [wordnet.lch_similarity, wordnet.path_similarity, wordnet.wup_similarity]
-    for f in functions:
-        print(f(word1,word2))
+    #words = brown.words()
+    word1 = wordnet.synsets('District')[0]
+    word2 = 'Court'
+    print(word1.word())
+    #for word in words:
+        
+    #print(words[:10])
+    #word1 = wordnet.synsets('chair')[0]
+    #word2 = wordnet.synsets('table')[0]
+    
+    #functions = [wordnet.lch_similarity, wordnet.path_similarity, wordnet.wup_similarity]
+    #for f in functions:
+        #print(f(word1,word2))
     #print(wordnet.lch_similarity(word1,word2))
     #print(wordnet.wup_similarity(word1,word2))
     #print(wordnet.path_similarity(word1,word2))
