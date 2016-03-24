@@ -1,8 +1,8 @@
 # UI
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  1:45 PM 1/24/16
-# Version       2.4
+# Last Updated  2:45 PM 3/23/16
+# Version       2.6
 
 import excel
 from openpyxl import *
@@ -22,11 +22,12 @@ newc     add a new corpus
 listc    lists all available corpora by registered name
 swa      single word analysis
 swac     single word analysis with a corpus
-mwa      multi-word analysis
+mwaw     multi-word analysis using word definitions and POS
+mwax     multi-word analysis using excel and wordnet data
 mwac     multi-word analysis with a corpus
 dwsa     dual-word similarity analysis
 polys    polysemy rating for a selection of words
-mindep   mindepth of a selection of words
+mindep   mindepth of word/s (first result only, see dtree for alternate synsets)
 pol_min  runs both polysemy and mindepth analysis of a selection of words
 dtree    depth tree of a given word (working on making it neater)
 
@@ -81,8 +82,10 @@ def interface()->(str, int):
             return ('swa', swa())
         elif cmd == 'swac':
             return ('swac', swac())
-        elif cmd == 'mwa':
-            return ('mwa', mwa())
+        elif cmd == 'mwaw':
+            return ('mwaw', mwa())
+        elif cmd == 'mwax':
+            return ('mwax', mwa())
         elif cmd == 'mwac':
             return ('mwac', mwac())
         elif cmd == 'dwsa':
@@ -325,13 +328,17 @@ def print_data(value)->None:
             print_nltk(data[0][1])
         print_wordnet(data[0][2])
         print_excel(data[0][3])
-    if function in ['mwa', 'mwac']:
+    if function in ['mwax', 'mwac']:
         for word in data:
             print("\n{}\nWord: {}".format('*'*80,word[0]))
             if function == 'mwac':
                 print_nltk(word[1])
             print_wordnet(word[2])
             print_excel(word[3])
+    if function in ['mwaw']:
+        for word in data:
+            print("\n{}\nWord: {}".format('*'*80,word[0]))
+            print_word_def(word[1:])
     if function == 'dwsa':
         print("\nWord 1                Word 2\nSimilarity (LCH, WUP, Path)")
         for word in data:
@@ -397,6 +404,13 @@ def print_wordnet(data)->None:
         print(hypo)
     return
 
+def print_word_def(data)->None:
+    '''prints a words definitions, POS, etc'''
+    print("Definition #     Synset          Depth POS    POS definition # Definition")
+    for num in range(len(data)):
+        print("{:3} {:28} {:5} {:19} {:3} {}".format(data[num][1], data[num][2], data[num][3], data[num][4], data[num][5], data[num][6]))
+    return
+
 def print_excel(data)->None:
     '''prints data from excel spreadsheets'''
     print("\nTASA number: {}".format(data[2]))
@@ -423,6 +437,7 @@ gr7:  {}\ngr8:  {}\ngr9:  {}\ngr10: {}\ngr11: {}\ngr12: {}\ngr13: {}""".format(
 def print_dtree(data):
     '''prints dtree data'''
     from pprint import pprint
+    depth = lambda L: isinstance(L, list) and max(map(depth, L))+1
     d_count = 0
     if (len(data[1]) > 1):
         print("Multiple definitions for the word {} detected: \n".format(data[0]))
@@ -436,7 +451,7 @@ def print_dtree(data):
             if action == 'all':
                 print("\nNote: multiple entires on the same line are equivalent")
                 for def_index in range(d_count):
-                    print("\nDtree of '{}' as defined as: {}".format(data[0],data[1][def_index]))
+                    print("\nDtree of '{}' with depth {} as defined as: {}".format(data[0],depth(data[3][def_index]) - 1,data[1][def_index]))
                     pprint(data[3][def_index])
                 return
             else:
@@ -447,7 +462,7 @@ def print_dtree(data):
                     dtree = data[3][int(action)]
                     #in this order to make the note only appear if it works
                     print("\nNote: multiple entires on the same line are equivalent")
-                    print("\nDtree of '{}' as defined as: {}".format(data[0],data[1][action]))
+                    print("\nDtree of '{}' with depth {} as defined as: {}".format(data[0],depth(dtree) - 1,data[1][action]))
                     pprint(dtree)
                     return
                 except:

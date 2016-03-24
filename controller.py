@@ -1,8 +1,8 @@
 # Controller
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  1:45 PM 1/24/16
-# Version       2.4
+# Last Updated  2:45 PM 3/23/16
+# Version       2.5
 
 import UI
 import nltk
@@ -70,13 +70,15 @@ def collect_data(in_data)->list:
     if function == 'newc':
         data = corupus_setup(other[0], other[1])
     if function == 'swa':
-        data = analyze([other], False)
+        data = analyze([other], 0)
     if function == 'swac':
-        data = analyze([other[1]], True, other[0])
-    if function == 'mwa':
-        data = analyze(other, False)
+        data = analyze([other[1]], 1, other[0])
+    if function == 'mwaw':
+        data = analyze(other, 2)
+    if function == 'mwax':
+        data = analyze(other, 0)
     if function == 'mwac':
-        data = analyze(other[1], True, other[0])
+        data = analyze(other[1], 1, other[0])
     if function == 'dwsa':
         data = dual_word(other)
     if function == 'polys':
@@ -141,7 +143,20 @@ def corupus_setup(file, name: str)->bool:
         return False
     return True
 
-def analyze(words: [str], nltk: bool, corpus_id = 0)->[str]:
+def pos_redef(pos: str)->str:
+    '''converts the 1 letter synset POS into a real word'''
+    if pos == 'n':
+        return "noun"
+    if pos == 'a':
+        return "adjective"
+    if pos == 's':
+        return "satellite adjective"
+    if pos == 'r':
+        return "adverb"
+    if pos == 'v':
+        return "verb"
+
+def analyze(words: [str], nltk_wn: int, corpus_id = 0)->[str]:
     """analyze a given word and report all available data"""
     global corpus
     print("\nGathering data...")
@@ -157,8 +172,12 @@ def analyze(words: [str], nltk: bool, corpus_id = 0)->[str]:
         result.append(list())
         result[x].append(word)
         #nltk analysis
-        if nltk:
+        if nltk_wn == 1:
             result[x].append(nltk_data(word))
+        elif nltk_wn == 2:
+            result[x] += word_def_data(word) #only works because python likes lists
+            x += 1
+            continue
         else:
             result[x].append(None)
         #wordnet analysis
@@ -219,6 +238,26 @@ def wordnet_data(word: str)->[str]:
     result[4] = (word.name().split('.')[0] for word in word_info.hyponyms())
     result[5] = (word.name().split('.')[0] for word in word_info.hypernyms())
     return result
+
+def word_def_data(word: str)->list:
+    '''returns a list of word definitions, POS, synsets, etc'''
+    #word, def #, synset, mindepth, POS, POS #, definition
+    results = []
+    word_info = wordnet.synsets(word)
+    num = 0
+    pos_num = 0
+    pos = '?'
+    for synset in word_info:
+        new_pos = pos_redef(synset.pos())
+        if pos != new_pos:
+            pos = new_pos
+            pos_num = 0
+        else:
+            pos_num += 1
+        result = [word, num, synset, synset.min_depth(), pos, pos_num, synset.definition()]
+        results.append(result)
+        num += 1
+    return results
 
 def dual_word(words: [str])->list:
     '''returns a list of word similarities'''

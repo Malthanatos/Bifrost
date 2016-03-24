@@ -55,7 +55,6 @@ the extension), please ensure that the file is present in the current
 folder and that all words are listed in the first or second columns (excel)
 or as a list seperated by spaces (text).\n""")
     results = [None]
-    file = open('common_words.txt').read().splitlines()
     while (True):
         try:
             file = input("File name: ").strip()
@@ -188,7 +187,8 @@ printed back to you and the next word will be displayed. When all word
 definitons are chosen the porgram will display the final synsets and ask you to
 provide a name for a file to output the results to. The results are formatted
 such that each word pair is listed followed by the three similarity comparisons
-followed by the definitions used for the given words.\n''')
+followed by the definitions used for the given words. Note that entering two
+word definitions with different parts of speech will crash the program.\n''')
     words = word_source()
     results = similarity(words)
     handle_results(results)

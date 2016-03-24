@@ -1,8 +1,8 @@
 # Excel
 # Author :      Nathan Krueger
 # Created       11:45 AM 8/9/15
-# Last Updated  5:00 PM 3/6/16
-# Version       2.7
+# Last Updated  4:20 PM 3/24/16
+# Version       2.8
 
 from openpyxl import *
 
@@ -11,6 +11,9 @@ sheet = None
 
 def file_setup(data, file_name: str, sheet_name = '', sheet_index = 0)->None:
     '''sets up the files header row'''
+    if type(data) != [] or type(data[0]) != [] or len(data[0]) == 0:
+        print("\n\n\nSomething happened to the data... Either you screwed up or I did. Double check and if you think I did then this is a bug, write down what you did and send it to me.\n\n\n")
+        return
     global file, sheet
     try: #file exists, add a new sheet
         file = load_workbook(file_name)
@@ -29,9 +32,23 @@ def file_setup(data, file_name: str, sheet_name = '', sheet_index = 0)->None:
         similarity(data)
     elif len(data[0]) == 7:
         similarity_BSSA(data)
+    elif type(data[0][1]) == list and len(data[0][1]) == 7:
+        word_def_setup(data)
     else:
         excel_based_setup(data)
     file.save(file_name)
+    return
+
+def word_def_setup(data)->None:
+    '''sets up a word definition data spreadsheet'''
+    sheet.cell(row = 1, column = 1).value = 'Word'
+    sheet.cell(row = 1, column = 2).value = 'Synset #'
+    sheet.cell(row = 1, column = 3).value = 'Synset'
+    sheet.cell(row = 1, column = 4).value = 'Depth'
+    sheet.cell(row = 1, column = 5).value = 'POS'
+    sheet.cell(row = 1, column = 6).value = 'POS #'
+    sheet.cell(row = 1, column = 7).value = 'Definition'
+    write_word_def(data)
     return
 
 def polys_mindep_setup(data)->None:
@@ -103,6 +120,21 @@ def write_excel(data)->None:
         sheet.cell(row = index, column = 8).value = word[3][4][0]
         sheet.cell(row = index, column = 9).value = word[3][4][1]
         index += 1
+    return
+
+def write_word_def(data)->None:
+    '''writes excel data to an excel file'''
+    index = 2
+    for word in data:
+        for synset in word[1:]:
+            sheet.cell(row = index, column = 1).value = synset[0]
+            sheet.cell(row = index, column = 2).value = synset[1]
+            sheet.cell(row = index, column = 3).value = str(synset[2])
+            sheet.cell(row = index, column = 4).value = synset[3]
+            sheet.cell(row = index, column = 5).value = synset[4]
+            sheet.cell(row = index, column = 6).value = synset[5]
+            sheet.cell(row = index, column = 7).value = synset[6]
+            index += 1
     return
 
 def write_polys_mindep(data)->None:
