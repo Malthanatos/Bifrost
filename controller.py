@@ -39,6 +39,22 @@ def run()->None:
     """Initializes program"""
     #global corpus
     #may want to load excel files on a case by case basis later on
+    print("""
+Please cite as:
+Lawrence, J., & Krueger, N. (2016). Bifrost: Bridging linguistic, cognitive and computer science resources (Version Master). Retrieved from https://github.com/Malthanatos/Bifrost
+
+This program was developed with support from the University of California Academic Senate Council on Research, Computing, and Libraries (CORCL).
+
+Please contract Joshua Lawrence at jflawren@uci.edu for any of the following papers that have used from data derived from the Bifrost program:
+
+Lawrence, J. F., Hwang, J. K., Hagen, A., & Lin, G. (n.d.). What makes an academic word difficult to know?: Exploring lexical dimensions across novel measures of word knowledge. 
+
+Lawrence, J.F., Hagen, A., Hwang, J. K., Lin, G., & Arne, L. (n.d.). Academic vocabulary and reading comprehension: Exploring the relationships across measures of vocabulary knowledge.
+
+Lawrence, J. F., Lin, G., Jaeggi, S., Krueger, N., Hwang, J. K., & Hagen, A. (n.d.). Polysemy and semantic precision: Standardized semantic measures extracted from Wordnet for 100,000 words in English.
+
+Lawrence, J. F., (n.d.) Semantic precision and polysemy: Key indices of word difficulty and utility for reading.
+""")
     if load_excel_files:
         print("\nLoading excel files...")
         excel_setup()
