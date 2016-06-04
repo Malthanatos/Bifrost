@@ -1,8 +1,8 @@
 # Controller
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  2:45 PM 3/23/16
-# Version       2.5
+# Last Updated  3:15 PM 6/4/16
+# Version       2.61
 
 import UI
 import nltk
@@ -22,8 +22,6 @@ if load_NLTK_corpora:
 else:
     print("""WARNING: You are in non-NLTK-corpus debugging mode,
 this may cause program crashes when using mwac/swac!""")
-
-
 
 #global variable declarations:
 word = ''
@@ -321,7 +319,7 @@ def polysemy(words: [str])->list:
     print("\nGathering data...")
     result = []
     for word in words:
-        word_data = [word,0,0,0,0,0]
+        word_data = [word,0,0,0,0,0,'N/A','N/A','N/A','N/A','N/A']
         word_info = wordnet.synsets(word)
         for synset in word_info:
             #if synset.name().split('.')[0] != word:
@@ -344,21 +342,21 @@ def mindepth(words: [str])->list:
     print("\nGathering data...")
     result = []
     for word in words:
-        word_data = [word,-1,-1,-1,-1,-1]
+        word_data = [word,'N/A','N/A','N/A','N/A','N/A',-1,-1,-1,-1,-1]
         word_info = wordnet.synsets(word)
         for index in range(len(word_info)):
             #if word_info[index].name().split('.')[0] != word:
                 #continue
-            if word_info[index].pos() == 'n' and word_data[1] == -1:
-                word_data[1] = word_info[index].min_depth()
-            if word_info[index].pos() == 'a' and word_data[2] == -1:
-                word_data[2] = word_info[index].min_depth()
-            if word_info[index].pos() == 's' and word_data[3] == -1:
-                word_data[3] = word_info[index].min_depth()
-            if word_info[index].pos() == 'r' and word_data[4] == -1:
-                word_data[4] = word_info[index].min_depth()
-            if word_info[index].pos() == 'v' and word_data[5] == -1:
-                word_data[5] = word_info[index].min_depth()
+            if word_info[index].pos() == 'n' and word_data[6] == -1:
+                word_data[6] = word_info[index].min_depth()
+            if word_info[index].pos() == 'a' and word_data[7] == -1:
+                word_data[7] = word_info[index].min_depth()
+            if word_info[index].pos() == 's' and word_data[8] == -1:
+                word_data[8] = word_info[index].min_depth()
+            if word_info[index].pos() == 'r' and word_data[9] == -1:
+                word_data[9] = word_info[index].min_depth()
+            if word_info[index].pos() == 'v' and word_data[10] == -1:
+                word_data[10] = word_info[index].min_depth()
         result.append(word_data)
     return result
 

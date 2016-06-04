@@ -1,8 +1,8 @@
 # UI
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  2:45 PM 3/23/16
-# Version       2.6
+# Last Updated  3:30 PM 6/4/16
+# Version       2.61
 
 import excel
 from openpyxl import *
@@ -348,16 +348,19 @@ def print_data(value)->None:
         print("\nWord                Noun  Adj  SatAdj  Adv  Verb")
         for word in data:
             print("{:18}{:6}{:5}{:8}{:5}{:6}".format(word[0],word[1],word[2],word[3],word[4],word[5]))
-    if function == 'mindep' or function == 'pol_min':
+    if function == 'pol_min':
         print("""\nMin depth of the first, or most common definition for each part of
 speech of each word; -1 signifies that no defintion of that type was found:""")
         print("\nWord  Min depth as: Noun  Adj  SatAdj  Adv  Verb")
-        if function == 'pol_min':
-            for word in data:
-                print("{:18}{:6}{:5}{:8}{:5}{:6}".format(word[0],word[6],word[7],word[8],word[9],word[10]))
-        else:
-            for word in data:
-                print("{:18}{:6}{:5}{:8}{:5}{:6}".format(word[0],word[1],word[2],word[3],word[4],word[5]))
+        for word in data:
+            print("{:18}{:6}{:5}{:8}{:5}{:6}".format(word[0],word[6],word[7],word[8],word[9],word[10]))
+    if function == 'mindep':
+        print("""\nMin depth of the first, or most common definition for each part of
+speech of each word; -1 signifies that no defintion of that type was found:""")
+        print("\nWord  Min depth as: Noun  Adj  SatAdj  Adv  Verb")
+        for word in data:
+            print("{:18}{:6}{:5}{:8}{:5}{:6}".format(word[0],word[6],word[7],word[8],word[9],word[10]))
+
     if function == 'dtree':
         print_dtree(data)
     return
@@ -470,7 +473,7 @@ def print_dtree(data):
     elif (len(data[1]) == 1):
         print('Only 1 defintion of the word "{}" wss found: '.format(data[0]))
         print("\nNote: multiple entires on the same line are equivalent")
-        print("\nDtree of '{}' as defined as: {}".format(data[0],data[1][def_index]))
+        print("\nDtree of '{}' as defined as: {}".format(data[0],data[1][0]))
         pprint(data[3][0])
     else:
         print('No defintions for the word "{}" were found...'.format(data[0]))
