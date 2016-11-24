@@ -9,9 +9,10 @@ from openpyxl import *
 file = None
 sheet = None
 
-def file_setup(data, file_name: str, sheet_name = '', sheet_index = 0)->None:
+def file_setup(value, file_name: str, sheet_name = '', sheet_index = 0)->None:
     '''sets up the files header row'''
-    if type(data) != [] or type(data[0]) != [] or len(data[0]) == 0:
+    data, function = value
+    if type(data) != list or (type(data[0]) != int) and (type(data[0]) != list or len(data[0]) == 0):
         print("\n\n\nSomething happened to the data... Either you screwed up or I did. Double check and if you think I did then this is a bug, write down what you did and send it to me.\n\n\n")
         return
     global file, sheet
@@ -26,14 +27,16 @@ def file_setup(data, file_name: str, sheet_name = '', sheet_index = 0)->None:
         except:
             print("Err: make sure that the file is closed if it exists!")
             file_setup(data, file_name, sheet_name)
-    if len(data[0]) == 11:
+    if function == 'pol_min':
         polys_mindep_setup(data)
-    elif len(data[0]) == 5:
+    elif function == 'dwsa':
         similarity(data)
-    elif len(data[0]) == 7:
+    elif function == 'bssa':
         similarity_BSSA(data)
-    elif type(data[0][1]) == list and len(data[0][1]) == 7:
+    elif function == 'swa' or function == 'mwa':
         word_def_setup(data)
+    elif function == 'xhyper':
+        xhyper_setup(data)
     else:
         excel_based_setup(data)
     file.save(file_name)
@@ -104,6 +107,14 @@ def similarity_BSSA(data)->None:
     sheet.cell(row = 1, column = 6).value = 'Word 1 Definition'
     sheet.cell(row = 1, column = 7).value = 'Word 2 Definition'
     write_sim_BSSA(data)
+    return
+
+def xhyper_setup(data)->None:
+    ''''sets up existing spreadsheet of word pairs to '''
+    sheet.cell(row = 1, column = 1).value = 'Word'
+    for x in range(data[0]):
+        sheet.cell(row = 1, column = x + 2).value = 'Hypernym {}'.format(x + 1)
+    write_xhyper(data)
     return
 
 def write_excel(data)->None:
@@ -181,5 +192,15 @@ def write_sim_BSSA(data)->None:
         sheet.cell(row = index, column = 5).value = word[4]
         sheet.cell(row = index, column = 6).value = word[5]
         sheet.cell(row = index, column = 7).value = word[6]
+        index +=1
+    return
+
+def write_xhyper(data)->None:
+    '''writes BSSA similarity data to file'''
+    index = 2
+    for word in data[1:]:
+        sheet.cell(row = index, column = 1).value = word[0]
+        for x in range(data[0]):
+            sheet.cell(row = index, column = x + 2).value = str(word[2][x])
         index +=1
     return

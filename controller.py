@@ -103,6 +103,8 @@ def collect_data(in_data)->list:
         data = polys_mindep(other)
     if function == 'dtree':
         data = depth_tree(other)
+    if function == 'xhyper':
+        data = xhyper(other)
     return (data, function)
 
 def excel_setup()->None:
@@ -419,19 +421,50 @@ def depth_tree(word)->str:
     result = ['',[],[],[]]
     result[0] = word
     word_info = wordnet.synsets(word)
+    hyp = lambda w: w.hypernyms()
     if (len(word_info) > 0):
         word_info = word_info[0]
     else:
         return result
+    #iterating over word_info does not work:
     for synset in wordnet.synsets(word):
         result[1].append(synset.definition())
         result[2].append(synset.pos())
-        hyp = lambda w:w.hypernyms()
         result[3].append(synset.tree(hyp))
     return result
     #word = wordnet.synsets(word)[0]
     #hyp = lambda w:w.hypernyms()
     #return word.tree(hyp)
+
+def valueAt(pos, L)->str:
+    try:
+        if pos == 0:
+            return L[0]
+        else:
+            return valueAt(pos - 1, L[1])
+    except:
+        return None
+
+def xhyper(words)->[str]:
+    '''returns the highest order x hypernyms'''
+    x = UI.request_x()
+    print("\nNote: this program will use of the first word definition it finds and the\nfirst parallel synset if there are any")
+    print("\nGathering data...")
+    result = [x]
+    hyp = lambda w: w.hypernyms()
+    depth = lambda L: isinstance(L, list) and max(map(depth, L))+1
+    for i in range(len(words)):
+        synsets = wordnet.synsets(words[i])
+        if len(synsets) > 0:
+            hyper = wordnet.synsets(words[i])[0].tree(hyp)
+            d = depth(hyper) - 1
+            xhyper = []
+            for j in range(x):
+                xhyper.append(valueAt(d - j, hyper))
+            result.append([words[i], hyper[0], xhyper])
+        else:
+            result.append([words[i], [None]])
+    return result
 
 #Note: excel data is not optimally formatted, so linear search is used
 #      this may be changed to binary search later on when the files are in alphabetical order

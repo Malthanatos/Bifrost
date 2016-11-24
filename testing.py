@@ -11,12 +11,44 @@ from nltk.corpus import brown
 from nltk.corpus import wordnet
 from nltk.collocations import BigramCollocationFinder as bcf
 
+import controller
+import UI
+
 #see http://stackoverflow.com/questions/21165702/nltk-collocations-for-specific-words
 #see https://blogs.princeton.edu/etc/files/2014/03/Text-Analysis-with-NLTK-Cheatsheet.pdf
 
 sheet = ''
 
+def valueAt(pos, L):
+    try:
+        if pos == 0:
+            return L[0]
+        else:
+            return valueAt(pos - 1, L[1])
+    except:
+        return None
+
 def run():
+    from pprint import pprint
+    depth = lambda L: isinstance(L, list) and max(map(depth, L))+1
+    #valueAt = lambda pos, L: L[0] if pos == 0 else valueAt(pos - 1, L[1])
+
+    #print("\nDtree of '{}' with depth {} as defined as: {}".format(data[0],depth(data[3][def_index]) - 1,data[1][def_index]))
+    result = controller.xhyper(['cow'])
+    print(str(result[1][1]))
+    #word, definitions, pos, synsets and hypernym chains
+    #pprint(result[3][0])
+    #pprint(depth(result[3][1]))
+    #pprint(depth(result[3][2]))
+    #pprint(depth(result[3][3]))
+    #print(valueAt(depth(result[3][0]), result[3][0]))
+    #print(valueAt(depth(result[3][0]) - 1, result[3][0]))
+    #print(valueAt(depth(result[3][0]) - 2, result[3][0]))
+    #print(valueAt(depth(result[3][0]) - 3, result[3][0]))
+    #print(controller.xhyper(["cow"]))
+    test = [1,2,3,4]
+    print(test[1:])
+    
     #corpus_id = 1
     #corpus = eval('text' + str(corpus_id))
     #texts() or sents() for material list
@@ -26,9 +58,9 @@ def run():
     #print(ic)
     #GET IC TO WORK
     #words = brown.words()
-    word1 = wordnet.synsets('District')[0]
-    word2 = 'Court'
-    print(word1.word())
+    #word1 = wordnet.synsets('District')[0]
+    #word2 = 'Court'
+    #print(word1.word())
     #for word in words:
         
     #print(words[:10])

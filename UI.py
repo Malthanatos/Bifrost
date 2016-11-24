@@ -30,6 +30,7 @@ polys    polysemy rating for a selection of words
 mindep   mindepth of word/s (first result only, see dtree for alternate synsets)
 pol_min  runs both polysemy and mindepth analysis of a selection of words
 dtree    depth tree of a given word (working on making it neater)
+xhyper   returns the highest order x (given number) hypernyms of a word or words
 
 q        quit
 
@@ -99,6 +100,8 @@ def interface()->(str, int):
             return ('pol_min', mwa())
         elif cmd == 'dtree':
             return ('dtree', swa())
+        elif cmd == 'xhyper':
+            return ('xhyper', mwa())
         elif cmd == 'q':
             print("Goodbye")
             return ('quit', None)
@@ -180,6 +183,16 @@ def swac()->(int,str):
     word = input("Please enter a word to analyze: ").strip().lower()
     return (corpus, word)
 
+def request_x()->int:
+    """asks user to provide an integer representing the number of hypernyms to return from controller"""
+    while True:
+        try:
+            x = int(input("Please enter an integer, x, representing how many high order hypernyms\nto return per word: ").strip().lower())
+            break
+        except:
+            print("X must be an integer")
+    return x
+
 def mwa()->[str]:
     """run an analysis on several words"""
     while True:
@@ -247,7 +260,7 @@ the current folder and that all words are listed in the first column
             print("This excel document or sheet is not available, please make sure that you \ntyped it correctly")
             continue
     result = []
-    for pos in range(len(sheet.rows)):
+    for pos in range(len(tuple(sheet.rows))):
         try:
             result.append(str(sheet.cell(row = pos + 1, column = 1).value))
             if dual:
@@ -283,6 +296,9 @@ def output_data(value)->None:
 
 def data_to_file(value)->None:
     '''outputs the data as a file of specified name and type'''
+    if value[1] in ['newc','dtree']:
+        print("Error: newc and dtree do not support Excel output as their outputs\nare variably sized or empty")
+        return
     print("""
 Warning: for the moment this program cannot append to files,
 only create and overwrite them, please be careful about using existing files
@@ -307,10 +323,7 @@ and be sure that the file is not open in another window.
 
 def file_from_data(value, file_name: str, sheet_index: int)->None:
     '''creates an output file using the given name'''
-    data, function = value
-    if function in ['newc','dtree']:
-        return
-    excel.file_setup(data, file_name, sheet_index)
+    excel.file_setup(value, file_name, sheet_index)
     return
 
 def print_data(value)->None:
@@ -340,6 +353,7 @@ def print_data(value)->None:
             print("\n{}\nWord: {}".format('*'*80,word[0]))
             print_word_def(word[1:])
     if function == 'dwsa':
+        #weird things here, check what happens when result is none
         print("\nWord 1                Word 2\nSimilarity (LCH, WUP, Path)")
         for word in data:
            print("\n{:18}{:18}\n{}   {}   {}".format(word[0],word[1],word[2],word[3],word[4])) 
@@ -363,6 +377,8 @@ speech of each word; -1 signifies that no defintion of that type was found:""")
 
     if function == 'dtree':
         print_dtree(data)
+    if function == 'xhyper':
+        print_xhyper(data)
     return
 
 def print_nltk(data)->None:
@@ -409,9 +425,9 @@ def print_wordnet(data)->None:
 
 def print_word_def(data)->None:
     '''prints a words definitions, POS, etc'''
-    print("Definition #     Synset          Depth POS    POS definition # Definition")
+    print("Definition # Synset                Depth POS    POS definition # Definition")
     for num in range(len(data)):
-        print("{:3} {:28} {:5} {:19} {:3} {}".format(data[num][1], data[num][2], data[num][3], data[num][4], data[num][5], data[num][6]))
+        print("{:3} {:30} {:5} {:19} {:3} {}".format(data[num][1], str(data[num][2]), data[num][3], data[num][4], data[num][5], data[num][6]))
     return
 
 def print_excel(data)->None:
@@ -477,6 +493,16 @@ def print_dtree(data):
         pprint(data[3][0])
     else:
         print('No defintions for the word "{}" were found...'.format(data[0]))
+    return
+
+def print_xhyper(data):
+    """prints the data from xhyper"""
+    for word in data[1:]:
+        print("Word: {}\nSynset used: {}".format(word[0], word[1]))
+        for x in word[2]:
+            if x is None:
+                break
+            print("\t{}".format(x))
     return
 
 def sort(data)->list:

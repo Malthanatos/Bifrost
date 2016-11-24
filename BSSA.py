@@ -22,7 +22,8 @@ def excel_file(file_name):
             print("This excel document or sheet is not available, please make sure that you \ntyped it correctly")
             return [None]
     result = []
-    for pos in range(len(sheet.rows)):
+    #this is causing crashes?
+    for pos in range(len(tuple(sheet.rows))):
         try:
             result.append(str(sheet.cell(row = pos + 1, column = 1).value))
             result.append(str(sheet.cell(row = pos + 1, column = 2).value))
@@ -58,7 +59,7 @@ or as a list seperated by spaces (text).\n""")
     while (True):
         try:
             file = input("File name: ").strip()
-            #print(file)
+            #print(file[-1])
             #file = load_workbook(file_name)
             if file[-1] == 'x':
                 results = excel_file(file)
@@ -127,7 +128,7 @@ def similarity(words: list)->list:
     synsets = ask_for_word_defs(words)
     print("\n{}\n".format('*'*80))
     for i in range(int(len(synsets)/2)):
-        print("{:30}{}".format(synsets[2*i], synsets[2*i + 1]))
+        print("{:30}{}".format(str(synsets[2*i]), str(synsets[2*i + 1])))
     print("\n{}\n".format('*'*80))
     print("Running comparisons...")
     for i in range(int(len(synsets)/2)):
@@ -165,7 +166,7 @@ and be sure that the file is not open in another window.
             continue
         sheet_name = input("Please enter a sheet name: ").strip()
         break
-    excel.file_setup(results, file_name, sheet_name)
+    excel.file_setup([results,'bssa'], file_name, sheet_name)
     print("\n{}\n".format('*'*80))
     print("Results have been saved!")
     return
