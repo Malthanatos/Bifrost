@@ -1,8 +1,8 @@
 # Excel
 # Author :      Nathan Krueger
 # Created       11:45 AM 8/9/15
-# Last Updated  4:20 PM 3/24/16
-# Version       2.8
+# Last Updated  8:20 AM 11/25/16
+# Version       2.91
 
 from openpyxl import *
 
@@ -201,6 +201,9 @@ def write_xhyper(data)->None:
     for word in data[1:]:
         sheet.cell(row = index, column = 1).value = word[0]
         for x in range(data[0]):
-            sheet.cell(row = index, column = x + 2).value = str(word[2][x])
+            try:
+                sheet.cell(row = index, column = x + 2).value = str(word[2][x])
+            except:
+                sheet.cell(row = index, column = x + 2).value = None
         index +=1
     return

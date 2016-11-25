@@ -1,8 +1,8 @@
 # Binary Synset Similarity Analysis
 # Author :      Nathan Krueger
 # Created       6:00 PM 2/26/16
-# Last Updated  5:00 PM 3/06/16
-# Version       1.0
+# Last Updated  10:50 AM 11/24/16
+# Version       1.1
 
 import nltk
 import excel
