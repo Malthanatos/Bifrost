@@ -1,8 +1,8 @@
 # UI
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  11:53 PM 11/24/16
-# Version       2.7
+# Last Updated  4:00 PM 12/2/16
+# Version       2.75
 
 import excel
 from openpyxl import *
@@ -498,8 +498,8 @@ def print_dtree(data):
 def print_xhyper(data):
     """prints the data from xhyper"""
     for word in data[1:]:
-        print("Word: {}\nSynset used: {}".format(word[0], word[1]))
-        for x in word[2]:
+        print("Word: {}\nSynset used: {}\nPOS: {}".format(word[0], word[2], word[1]))
+        for x in word[3]:
             if x is None:
                 break
             print("\t{}".format(x))

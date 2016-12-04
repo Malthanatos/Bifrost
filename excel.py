@@ -1,8 +1,8 @@
 # Excel
 # Author :      Nathan Krueger
 # Created       11:45 AM 8/9/15
-# Last Updated  8:20 AM 11/25/16
-# Version       2.91
+# Last Updated  4:00 AM 12/3/16
+# Version       2.95
 
 from openpyxl import *
 
@@ -112,8 +112,10 @@ def similarity_BSSA(data)->None:
 def xhyper_setup(data)->None:
     ''''sets up existing spreadsheet of word pairs to '''
     sheet.cell(row = 1, column = 1).value = 'Word'
+    sheet.cell(row = 1, column = 2).value = 'Synset used'
+    sheet.cell(row = 1, column = 3).value = 'POS'
     for x in range(data[0]):
-        sheet.cell(row = 1, column = x + 2).value = 'Hypernym {}'.format(x + 1)
+        sheet.cell(row = 1, column = x + 4).value = 'Hypernym {}'.format(x + 1)
     write_xhyper(data)
     return
 
@@ -200,10 +202,12 @@ def write_xhyper(data)->None:
     index = 2
     for word in data[1:]:
         sheet.cell(row = index, column = 1).value = word[0]
+        sheet.cell(row = index, column = 2).value = str(word[2])
+        sheet.cell(row = index, column = 3).value = word[1]
         for x in range(data[0]):
             try:
-                sheet.cell(row = index, column = x + 2).value = str(word[2][x])
+                sheet.cell(row = index, column = x + 4).value = str(word[3][x])
             except:
-                sheet.cell(row = index, column = x + 2).value = None
+                break
         index +=1
     return

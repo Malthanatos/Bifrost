@@ -11,8 +11,8 @@ from nltk.corpus import brown
 from nltk.corpus import wordnet
 from nltk.collocations import BigramCollocationFinder as bcf
 
-import controller
-import UI
+#import controller
+#import UI
 
 #see http://stackoverflow.com/questions/21165702/nltk-collocations-for-specific-words
 #see https://blogs.princeton.edu/etc/files/2014/03/Text-Analysis-with-NLTK-Cheatsheet.pdf
@@ -28,16 +28,47 @@ def valueAt(pos, L):
     except:
         return None
 
+def first_depth(L):
+    if (isinstance(L, list)):
+        if (len(L) == 1):
+            return 1
+        else:
+            return depth(L[1]) + 1
+    else:
+        return 1
+
 def run():
     from pprint import pprint
-    depth = lambda L: isinstance(L, list) and max(map(depth, L))+1
+    #depth = lambda L: isinstance(L, list) and max(map(depth, L)))+1
     #valueAt = lambda pos, L: L[0] if pos == 0 else valueAt(pos - 1, L[1])
 
+    test = ['cow.n.03',
+            ['unpleasant_woman.n.01',
+             ['unpleasant_person.n.01',
+              ['unwelcome_person.n.01',
+               ['person.n.01',
+                ['causal_agent.n.01',
+                 ['physical_entity.n.01',
+                  ['entity.n.01']]],
+                ['organism.n.01',
+                 ['living_thing.n.01',
+                  ['whole.n.02',
+                   ['object.n.01',
+                    ['physical_entity.n.01',
+                     ['entity.n.01']]]]]]]]]]]
+    d = depth(test) - 1
+    print(d)
+    for x in range(20):
+        print(valueAt(d-x, test))
+    #print(valueAt(0, test))
+    #print(valueAt(1, test))
+    #print(valueAt(2, test))
+    #print(valueAt(3, test))
     #print("\nDtree of '{}' with depth {} as defined as: {}".format(data[0],depth(data[3][def_index]) - 1,data[1][def_index]))
-    result = controller.xhyper(['cow'])
-    print(str(result[1][1]))
+    #result = controller.xhyper(['cow'])
+    #print(str(result[1][1]))
     #word, definitions, pos, synsets and hypernym chains
-    #pprint(result[3][0])
+    #pprint(result)
     #pprint(depth(result[3][1]))
     #pprint(depth(result[3][2]))
     #pprint(depth(result[3][3]))
@@ -46,8 +77,8 @@ def run():
     #print(valueAt(depth(result[3][0]) - 2, result[3][0]))
     #print(valueAt(depth(result[3][0]) - 3, result[3][0]))
     #print(controller.xhyper(["cow"]))
-    test = [1,2,3,4]
-    print(test[1:])
+    #test = [1,2,3,4]
+    #print(test[1:])
     
     #corpus_id = 1
     #corpus = eval('text' + str(corpus_id))

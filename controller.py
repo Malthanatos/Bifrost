@@ -1,8 +1,8 @@
 # Controller
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  9:45 AM 11/24/16
-# Version       2.7
+# Last Updated  4:15 AM 12/2/16
+# Version       2.75
 
 import UI
 import nltk
@@ -437,6 +437,7 @@ def depth_tree(word)->str:
     #return word.tree(hyp)
 
 def valueAt(pos, L)->str:
+    '''returns the value at position pos in the first branch encountered in L'''
     try:
         if pos == 0:
             return L[0]
@@ -445,6 +446,16 @@ def valueAt(pos, L)->str:
     except:
         return None
 
+def first_depth(L):
+    '''returns the depth of the first branch encountered in L'''
+    if (isinstance(L, list)):
+        if (len(L) == 1):
+            return 1
+        else:
+            return first_depth(L[1]) + 1
+    else:
+        return 1
+
 def xhyper(words)->[str]:
     '''returns the highest order x hypernyms'''
     x = UI.request_x()
@@ -452,16 +463,20 @@ def xhyper(words)->[str]:
     print("\nGathering data...")
     result = [x]
     hyp = lambda w: w.hypernyms()
-    depth = lambda L: isinstance(L, list) and max(map(depth, L))+1
+    #This would pick up the deepest branch's depth -> valueAt returns None -> returns None
+    #depth = lambda L: isinstance(L, list) and max(map(depth, L))+1
     for i in range(len(words)):
         synsets = wordnet.synsets(words[i])
         if len(synsets) > 0:
-            hyper = wordnet.synsets(words[i])[0].tree(hyp)
-            d = depth(hyper) - 1
-            xhyper = []
-            for j in range(x):
-                xhyper.append(valueAt(d - j, hyper))
-            result.append([words[i], hyper[0], xhyper])
+            for s in range(len(synsets)):
+                hyper = wordnet.synsets(words[i])[s].tree(hyp)
+                d = first_depth(hyper) - 1
+                xhyper = []
+                for j in range(x):
+                    xhyper.append(valueAt(d - j, hyper))
+                    if xhyper[-1] is None:
+                        break
+                result.append([words[i], pos_redef(hyper[0].pos()), hyper[0], xhyper])
         else:
             result.append([words[i], [None]])
     return result
