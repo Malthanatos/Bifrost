@@ -1,8 +1,8 @@
 # Controller
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  4:15 AM 12/2/16
-# Version       2.75
+# Last Updated  11:15 AM 12/4/16
+# Version       2.76
 
 import UI
 import nltk
@@ -459,17 +459,20 @@ def first_depth(L):
 def xhyper(words)->[str]:
     '''returns the highest order x hypernyms'''
     x = UI.request_x()
-    print("\nNote: this program will use of the first word definition it finds and the\nfirst parallel synset if there are any")
+    print("\nNote: this program will use the first parallel synset if there are any")
     print("\nGathering data...")
     result = [x]
     hyp = lambda w: w.hypernyms()
     #This would pick up the deepest branch's depth -> valueAt returns None -> returns None
     #depth = lambda L: isinstance(L, list) and max(map(depth, L))+1
     for i in range(len(words)):
-        synsets = wordnet.synsets(words[i])
+        synsets = wordnet.synsets(words[i]) 
         if len(synsets) > 0:
             for s in range(len(synsets)):
                 hyper = wordnet.synsets(words[i])[s].tree(hyp)
+                if (hyper[0].pos() in ['a','s','r']):
+                    result.append([words[i], 'None', 'None', [None]])
+                    continue
                 d = first_depth(hyper) - 1
                 xhyper = []
                 for j in range(x):
@@ -478,7 +481,7 @@ def xhyper(words)->[str]:
                         break
                 result.append([words[i], pos_redef(hyper[0].pos()), hyper[0], xhyper])
         else:
-            result.append([words[i], [None]])
+            result.append([words[i], 'None', 'None', [None]])
     return result
 
 #Note: excel data is not optimally formatted, so linear search is used

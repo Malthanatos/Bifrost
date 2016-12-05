@@ -1,8 +1,8 @@
 # Excel
 # Author :      Nathan Krueger
 # Created       11:45 AM 8/9/15
-# Last Updated  4:00 AM 12/3/16
-# Version       2.95
+# Last Updated  11:15 AM 12/4/16
+# Version       2.96
 
 from openpyxl import *
 
@@ -110,7 +110,7 @@ def similarity_BSSA(data)->None:
     return
 
 def xhyper_setup(data)->None:
-    ''''sets up existing spreadsheet of word pairs to '''
+    ''''sets up existing spreadsheet of xhyper data'''
     sheet.cell(row = 1, column = 1).value = 'Word'
     sheet.cell(row = 1, column = 2).value = 'Synset used'
     sheet.cell(row = 1, column = 3).value = 'POS'
@@ -198,9 +198,11 @@ def write_sim_BSSA(data)->None:
     return
 
 def write_xhyper(data)->None:
-    '''writes BSSA similarity data to file'''
+    '''writes xhyper output data'''
     index = 2
     for word in data[1:]:
+        if (str(word[2]) == 'None'):
+            continue
         sheet.cell(row = index, column = 1).value = word[0]
         sheet.cell(row = index, column = 2).value = str(word[2])
         sheet.cell(row = index, column = 3).value = word[1]
