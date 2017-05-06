@@ -1,8 +1,8 @@
 # Excel
 # Author :      Nathan Krueger
 # Created       11:45 AM 8/9/15
-# Last Updated  11:15 AM 12/4/16
-# Version       2.96
+# Last Updated  12:45 AM 1/5/17
+# Version       3.0
 
 from openpyxl import *
 
@@ -37,6 +37,8 @@ def file_setup(value, file_name: str, sheet_name = '', sheet_index = 0)->None:
         word_def_setup(data)
     elif function == 'xhyper':
         xhyper_setup(data)
+    elif function == 'hypersub':
+        hypersub_setup(data)
     else:
         excel_based_setup(data)
     file.save(file_name)
@@ -85,7 +87,7 @@ def excel_based_setup(data)->None:
     return
 
 def similarity(data)->None:
-    ''''sets up existing spreadsheet of word pairs to '''
+    '''sets up existing spreadsheet of word pairs to write'''
     sheet.cell(row = 1, column = 1).value = 'Word 1'
     sheet.cell(row = 1, column = 2).value = 'Word 2'
     sheet.cell(row = 1, column = 3).value = 'LCH'
@@ -98,7 +100,7 @@ def similarity(data)->None:
     return
 
 def similarity_BSSA(data)->None:
-    ''''sets up existing spreadsheet of word pairs to '''
+    '''sets up existing spreadsheet of word pairs to write'''
     sheet.cell(row = 1, column = 1).value = 'Word 1'
     sheet.cell(row = 1, column = 2).value = 'Word 2'
     sheet.cell(row = 1, column = 3).value = 'LCH'
@@ -110,13 +112,22 @@ def similarity_BSSA(data)->None:
     return
 
 def xhyper_setup(data)->None:
-    ''''sets up existing spreadsheet of xhyper data'''
+    '''sets up existing spreadsheet of xhyper data'''
     sheet.cell(row = 1, column = 1).value = 'Word'
     sheet.cell(row = 1, column = 2).value = 'Synset used'
     sheet.cell(row = 1, column = 3).value = 'POS'
     for x in range(data[0]):
         sheet.cell(row = 1, column = x + 4).value = 'Hypernym {}'.format(x + 1)
     write_xhyper(data)
+    return
+
+def hypersub_setup(data)->None:
+    '''sets up a spreadsheet of words with a given synset at a given depth'''
+    sheet.cell(row = 1, column = 1).value = 'Word'
+    sheet.cell(row = 1, column = 2).value = 'Synset'
+    sheet.cell(row = 1, column = 3).value = 'Hypernym'
+    sheet.cell(row = 1, column = 4).value = 'Found at Depth'
+    write_hypersub(data)
     return
 
 def write_excel(data)->None:
@@ -180,7 +191,7 @@ def write_sim(data)->None:
         #sheet.cell(row = index, column = 6).value = word[5]
         #sheet.cell(row = index, column = 7).value = word[6]
         #sheet.cell(row = index, column = 8).value = word[7]
-        index +=1
+        index += 1
     return
 
 def write_sim_BSSA(data)->None:
@@ -194,7 +205,7 @@ def write_sim_BSSA(data)->None:
         sheet.cell(row = index, column = 5).value = word[4]
         sheet.cell(row = index, column = 6).value = word[5]
         sheet.cell(row = index, column = 7).value = word[6]
-        index +=1
+        index += 1
     return
 
 def write_xhyper(data)->None:
@@ -211,5 +222,16 @@ def write_xhyper(data)->None:
                 sheet.cell(row = index, column = x + 4).value = str(word[3][x])
             except:
                 break
-        index +=1
+        index += 1
+    return
+
+def write_hypersub(data)->None:
+    '''sets up a spreadsheet of words with a given synset at a given depth'''
+    index = 2
+    for word in data:
+        sheet.cell(row = index, column = 1).value = word[0]
+        sheet.cell(row = index, column = 2).value = word[1]
+        sheet.cell(row = index, column = 3).value = word[2]
+        sheet.cell(row = index, column = 4).value = word[3]
+        index += 1
     return

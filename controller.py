@@ -1,8 +1,8 @@
 # Controller
 # Author :      Nathan Krueger
 # Created       5:00 PM 7/16/15
-# Last Updated  11:15 AM 12/4/16
-# Version       2.76
+# Last Updated  1:25 PM 5/6/17
+# Version       2.77
 
 import UI
 import nltk
@@ -15,13 +15,20 @@ load_excel_files = False
 load_NLTK_corpora = False
 if not load_excel_files:
     print("""WARNING: You are in non-excel debugging mode,
-this will result in data gathering failures and may result in a crash!""")
+this will speed up the program's startup, but when using some functions
+this will result in data gathering failures and may result in a crash!
+To change this access controller.py in a text editor and change line 14:
+"load_excel_files = False" to "load_excel_files = True"""")
 
 if load_NLTK_corpora:
     from nltk.book import *
 else:
     print("""WARNING: You are in non-NLTK-corpus debugging mode,
-this may cause program crashes when using mwac/swac!""")
+this will speed up the program's startup, but this may cause program
+crashes when using mwac/swac!
+To change this access controller.py in a text editor and change line 15:
+"load_NLTK_corpora = False" to "load_NLTK_corpora = True"
+""")
 
 #global variable declarations:
 word = ''
