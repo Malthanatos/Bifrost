@@ -20,10 +20,10 @@ Word Analysis
 Takes a given word and corpus and returns a series of formatted data points from available databases and functions.
 
 Requires:
-Python 3.3+
-Natural Language Toolkit for Python (NLTK)
-XLRD and openpyxl for Python (reads and writes Excel files)
+Python 3.3+, Natural Language Toolkit for Python (NLTK), XLRD, and openpyxl for Python (reads and writes Excel files)
 
-Recommended for full functionality:
-Numpy for Python,
-Matplotlib for Python
+Recommended for full functionality: Numpy for Python, Matplotlib for Python
+
+Additonal Independent Functions:
+
+BSSA (binary synset similarity analysis): given a set of word pairs, compare the similarity of each pair using a set of metrics provided by WordNet.
