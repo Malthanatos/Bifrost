@@ -84,7 +84,7 @@ word definitions with different parts of speech will fail.
 
 Please cite as:
 
-Lawrence, J., & Krueger, N. (2016). Bifrost: Bridging linguistic, cognitive and computer science resources (VersionMaster). Retrieved from https://github.com/Malthanatos/Bifrost
+Krueger, N., & Lawrence, J., (2016). Bifrost: Bridging linguistic, cognitive and computer science resources (VersionMaster). Retrieved from https://github.com/Malthanatos/Bifrost
 
 We extracted a total of 174,487 definitions. We tabulated these unique senses and meanings to establish two measures: in part of speech senses and meanings (IPOSSAM) and the across part of speech senses and meanings (APOSSAM). For example, the word phone has two entries, one with the part of speech of noun and the other with the part of speech of verb. Phone has three noun definitions and only one verb definition. The APOSSAM value for phone on both entries is 4 (3 + 1), and the IPOSSAM value for phone as a noun is 3 and as a verb is 1. We recoded two WordNet part-of-speech labels (adjective and satellite adjective) as adjectives. 
 
