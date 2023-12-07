@@ -14,19 +14,10 @@ def run()->None:
     """Initializes program"""
     print("""
 Please cite as:
-Lawrence, J., & Krueger, N. (2016). Bifrost: Bridging linguistic, cognitive and computer science resources (Version Reduced: Polysemy and Depth only). Retrieved from https://github.com/Malthanatos/Bifrost/tree/Reduced--Polysemy-and-Depth-only
+Krueger, N & Lawrence, J. (2016). Bifrost: Bridging linguistic, cognitive and computer science resources (Version Reduced: Polysemy and Depth only). Retrieved from https://github.com/Malthanatos/Bifrost/tree/Reduced--Polysemy-and-Depth-only
 
 This program was developed with support from the University of California Academic Senate Council on Research, Computing, and Libraries (CORCL).
 
-Please contract Joshua Lawrence at jflawren@uci.edu for any of the following papers that have used from data derived from the Bifrost program:
-
-Lawrence, J. F., Hwang, J. K., Hagen, A., & Lin, G. (n.d.). What makes an academic word difficult to know?: Exploring lexical dimensions across novel measures of word knowledge. 
-
-Lawrence, J.F., Hagen, A., Hwang, J. K., Lin, G., & Arne, L. (n.d.). Academic vocabulary and reading comprehension: Exploring the relationships across measures of vocabulary knowledge.
-
-Lawrence, J. F., Lin, G., Jaeggi, S., Krueger, N., Hwang, J. K., & Hagen, A. (n.d.). Polysemy and semantic precision: Standardized semantic measures extracted from Wordnet for 100,000 words in English.
-
-Lawrence, J. F., (n.d.) Semantic precision and polysemy: Key indices of word difficulty and utility for reading.
 """)
     print('''Notes: some 2 part words can be analyzed, however, the results
        - of the analysis of such words may be inconsistant depending on

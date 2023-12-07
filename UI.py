@@ -207,7 +207,7 @@ def print_dtree(data):
                 print("{}: noun: {}".format(def_index, data[1][def_index]))
                 d_count = d_count + 1
         while True:
-            action = input('\nWhich dtree would you like (choose an index or say "all"): ')
+            action = input('\nWhich meaning would you like to see the hypernym chain for?(choose an index or say "all"): ')
             if action == 'all':
                 print("\nNote: multiple entires on the same line are equivalent")
                 for def_index in range(d_count):
